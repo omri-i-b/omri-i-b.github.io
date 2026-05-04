@@ -116,40 +116,42 @@
       border: 1px solid var(--line); border-radius: 50%;
     }
 
-    /* ─── Scope badge (always visible in navbar) ─────── */
+    /* ─── Scope badge (always visible in navbar — the only entry to drawer) ─── */
     .scope-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 10px; border-radius: 999px;
-      background: var(--bg-3); border: 1px solid var(--line);
-      font-size: 10px; font-weight: 500; color: var(--ink-2);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 6px 5px 12px; border-radius: 999px;
+      background: var(--bg); border: 1px solid var(--line);
+      font: inherit; font-size: 11px; font-weight: 500; color: var(--ink);
       cursor: pointer; white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
       transition: all 0.15s;
     }
-    .scope-badge:hover { border-color: var(--ink-3); background: var(--line-3); }
+    .scope-badge:hover {
+      border-color: var(--ink); background: var(--bg-2);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .scope-badge.active {
+      border-color: var(--ink); background: var(--bg-2);
+    }
     .scope-badge .badge-label {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em;
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em;
       color: var(--ink-3); font-weight: 600;
     }
     .scope-badge.multi {
       background: var(--highlight); border-color: var(--highlight-line);
-      color: #5a4500;
+      color: #4a3700;
+    }
+    .scope-badge.multi:hover {
+      background: #fff0a3; border-color: #c9a838;
     }
     .scope-badge.multi .badge-label { color: #8a6d00; }
-
-    /* ─── Gear button ────────────────────────────────── */
-    .gear-btn {
-      width: 30px; height: 30px;
-      border: 1px solid var(--line); border-radius: 6px;
-      background: var(--bg); cursor: pointer;
+    .scope-badge .caret-chip {
       display: inline-flex; align-items: center; justify-content: center;
-      font-size: 14px; color: var(--ink-2);
-      transition: all 0.15s;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,0.06); color: inherit;
+      font-size: 9px;
     }
-    .gear-btn:hover { border-color: var(--ink-3); background: var(--bg-2); }
-    .gear-btn.active {
-      background: var(--highlight); border-color: var(--highlight-line);
-      color: #5a4500;
-    }
+    .scope-badge.multi .caret-chip { background: rgba(0,0,0,0.08); }
 
     /* ─── Page header ────────────────────────────────── */
     .page-head {
@@ -563,12 +565,6 @@ const FilterIcon = () => (
     <path d="M1 2h14L9.5 8.5V13l-3 1.5V8.5L1 2z" />
   </svg>
 );
-const GearIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
-    <circle cx="8" cy="8" r="2.5" />
-    <path d="M6.7 1.5h2.6l.3 1.8a5.5 5.5 0 0 1 1.3.8l1.7-.7 1.3 2.2-1.4 1.1a5.5 5.5 0 0 1 0 1.6l1.4 1.1-1.3 2.2-1.7-.7a5.5 5.5 0 0 1-1.3.8l-.3 1.8H6.7l-.3-1.8a5.5 5.5 0 0 1-1.3-.8l-1.7.7-1.3-2.2 1.4-1.1a5.5 5.5 0 0 1 0-1.6L2.1 5.6l1.3-2.2 1.7.7a5.5 5.5 0 0 1 1.3-.8l.3-1.8z" />
-  </svg>
-);
 const CheckIcon = () => (
   <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
     <path d="M2 6l3 3 5-5" />
@@ -583,6 +579,9 @@ const LockIcon = () => <span style={{ fontSize: 11 }}>🔒</span>;
 const Navbar = ({ activeFormIds, drawerOpen, onToggleDrawer }) => {
   const text = scopeText(activeFormIds);
   const isMulti = activeFormIds.length > 1;
+  const classes = ['scope-badge'];
+  if (isMulti) classes.push('multi');
+  if (drawerOpen) classes.push('active');
 
   return (
     <div className="nav">
@@ -591,20 +590,14 @@ const Navbar = ({ activeFormIds, drawerOpen, onToggleDrawer }) => {
         <span className="logo-text">rsvpify</span>
       </div>
       <div className="nav-right">
-        <span
-          className={'scope-badge' + (isMulti ? ' multi' : '')}
+        <button
+          className={classes.join(' ')}
           onClick={onToggleDrawer}
-          title="Click to change form scope (F)"
+          title="Change check-in settings (F)"
         >
           <span className="badge-label">Form</span>
           <span>{text}</span>
-        </span>
-        <button
-          className={'gear-btn' + (drawerOpen ? ' active' : '')}
-          onClick={onToggleDrawer}
-          title="Check-in settings (F)"
-        >
-          <GearIcon />
+          <span className="caret-chip">▾</span>
         </button>
         <span className="user-pill">Jade Stewart ▾</span>
       </div>
@@ -863,23 +856,7 @@ const ScannerScreen = ({ activeFormIds }) => {
   return (
     <div className="scanner-layout">
       <div className="scanner-sidebar">
-        <h4>Scan settings</h4>
-        <div className="setting-row">
-          <div>
-            <div className="setting-label">Auto-switch mode</div>
-            <div className="setting-desc">Auto check-in/out.</div>
-          </div>
-          <button className="toggle" />
-        </div>
-        <div className="setting-row">
-          <div>
-            <div className="setting-label">Tag filter</div>
-            <div className="setting-desc">Filter by tags.</div>
-          </div>
-          <button className="toggle" />
-        </div>
-
-        <h4 style={{ marginTop: 18 }}>Recent scans · {eligible.length} eligible</h4>
+        <h4>Recent scans · {eligible.length} eligible</h4>
         {filteredScans.map(s => (
           <div className="scan-row" key={s.name}>
             <div className="scan-dot" />
@@ -969,7 +946,7 @@ const App = () => {
           QR Scan
         </button>
         <span style={{ marginLeft: 16, opacity: 0.5 }}>
-          Press <span className="kbd" style={{ background: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}>F</span> to toggle settings
+          Click the form badge — or press <span className="kbd" style={{ background: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}>F</span>
         </span>
       </div>
 
