@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<!--
+  FORM-SCOPE DRAWER — Check-in scope control (V4 direction)
+
+  A global control that lets event staff scope Manage Guests and QR Scan
+  screens to a single form, multiple forms, or all forms attached to a
+  guest list. Implemented as a settings drawer with staged Apply model.
+
+  Surfaces: Manage Guests · QR Scan
+  Default scope: Primary form only
+  Design: V4 from wireframes — settings drawer
+
+  ============ WHAT THIS IMPLEMENTS ============
+
+  1. NAVBAR BADGE — always-visible "Form: RSVP form" pill showing scope
+  2. GEAR ICON — opens/closes the settings drawer
+  3. SETTINGS DRAWER — right-aligned, with:
+     - Form scope: multi-select checkboxes, PRIMARY badge, guest counts
+     - Quick presets: "Primary only" and "All forms"
+     - Other check-in settings: Auto-switch, Tag filter toggles
+     - Footer: Apply (staged commit) + Cancel
+  4. MANAGE GUESTS TABLE — form badges (dashed/solid), stats, filtering
+  5. QR SCAN VIEW — scope-aware scanner with recent scans feed
+  6. KEYBOARD SHORTCUTS — F to toggle drawer, Esc to close, Enter to apply
+
+  Edge cases handled:
+  - Multi-form guests (deduped, union of tags)
+  - Mid-scan scope switch (pause + toast + resume)
+  - Scoped staff permissions (locked forms)
+  - Empty/zero-guest states
+
+  ================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form-scope Drawer — Check-in POC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --ink-2: #4a4a4a;
+      --ink-3: #8a8a8a;
+      --line: #d9d9d9;
+      --line-2: #e8e8e8;
+      --line-3: #f0f0f0;
+      --bg: #ffffff;
+      --bg-2: #fafafa;
+      --bg-3: #f4f4f4;
+      --accent: #1a1a1a;
+      --accent-soft: #ececec;
+      --highlight: #fff7c2;
+      --highlight-line: #e6d066;
+      --warn: #b88500;
+      --green: #22c55e;
+      --green-soft: #f0fdf4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-3);
+      color: var(--ink);
+      height: 100%;
+    }
+    #root { height: 100%; }
+
+    /* ─── App shell ──────────────────────────────────── */
+    .app { display: flex; flex-direction: column; height: 100vh; position: relative; }
+
+    /* ─── Screen switcher (demo only) ────────────────── */
+    .demo-bar {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 10px;
+      background: var(--ink); color: white;
+      font-size: 11px; font-weight: 500;
+    }
+    .demo-bar button {
+      padding: 5px 14px; border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent; color: rgba(255,255,255,0.7);
+      font: inherit; font-weight: 500; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .demo-bar button.active {
+      background: white; color: var(--ink);
+      border-color: white;
+    }
+    .demo-bar button:hover:not(.active) {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* ─── Navbar ──────────────────────────────────────── */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; height: 48px;
+      border-bottom: 1px solid var(--line-2);
+      background: var(--bg-2);
+      flex-shrink: 0;
+    }
+    .nav-left { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--ink); flex-shrink: 0;
+    }
+    .logo-text { font-weight: 700; font-size: 13px; letter-spacing: -0.01em; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .user-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--ink-2); cursor: pointer;
+    }
+    .user-pill::before {
+      content: ''; width: 16px; height: 16px;
+      border: 1px solid var(--line); border-radius: 50%;
+    }
+
+    /* ─── Scope badge (always visible in navbar) ─────── */
+    .scope-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px;
+      background: var(--bg-3); border: 1px solid var(--line);
+      font-size: 10px; font-weight: 500; color: var(--ink-2);
+      cursor: pointer; white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .scope-badge:hover { border-color: var(--ink-3); background: var(--line-3); }
+    .scope-badge .badge-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--ink-3); font-weight: 600;
+    }
+    .scope-badge.multi {
+      background: var(--highlight); border-color: var(--highlight-line);
+      color: #5a4500;
+    }
+    .scope-badge.multi .badge-label { color: #8a6d00; }
+
+    /* ─── Gear button ────────────────────────────────── */
+    .gear-btn {
+      width: 30px; height: 30px;
+      border: 1px solid var(--line); border-radius: 6px;
+      background: var(--bg); cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--ink-2);
+      transition: all 0.15s;
+    }
+    .gear-btn:hover { border-color: var(--ink-3); background: var(--bg-2); }
+    .gear-btn.active {
+      background: var(--highlight); border-color: var(--highlight-line);
+      color: #5a4500;
+    }
+
+    /* ─── Page header ────────────────────────────────── */
+    .page-head {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--line-3);
+      flex-shrink: 0;
+    }
+    .crumb {
+      font-size: 10px; color: var(--ink-2);
+      display: flex; align-items: center; gap: 4px;
+      margin-bottom: 6px; cursor: pointer;
+    }
+    .crumb:hover { color: var(--ink); }
+    .event-title {
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      margin: 0 0 4px;
+    }
+    .event-meta {
+      font-size: 10px; color: var(--ink-3);
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .event-meta span + span::before { content: '·'; margin-right: 6px; }
+
+    /* ─── Stats bar ──────────────────────────────────── */
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--line-3);
+      border-bottom: 1px solid var(--line-3);
+    }
+    .stat {
+      background: var(--bg); padding: 10px 16px;
+    }
+    .stat-label {
+      font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--ink-3);
+    }
+    .stat-val {
+      font-size: 16px; font-weight: 600; margin-top: 2px;
+    }
+    .stat-pct { color: var(--ink-3); font-size: 10px; margin-left: 3px; }
+
+    /* ─── Toolbar ─────────────────────────────────────── */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--line-3);
+      flex-shrink: 0;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 10px; }
+    .toolbar-left strong { font-size: 13px; }
+    .toolbar-right { display: flex; align-items: center; gap: 8px; }
+    .search-box {
+      display: flex; align-items: center;
+      background: var(--bg-2); border: 1px solid var(--line);
+      border-radius: 6px; padding: 5px 10px;
+      font-size: 11px; color: var(--ink-3); min-width: 200px;
+    }
+    .search-box svg { margin-right: 6px; flex-shrink: 0; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 10px; border: 1px solid var(--line);
+      background: var(--bg); border-radius: 6px;
+      font: inherit; font-size: 11px; color: var(--ink);
+      cursor: pointer; transition: all 0.12s;
+    }
+    .btn:hover { border-color: var(--ink-3); background: var(--bg-2); }
+    .btn-primary {
+      background: var(--ink); color: white; border-color: var(--ink);
+    }
+    .btn-primary:hover { background: #333; }
+    .btn-primary:disabled {
+      background: var(--line); border-color: var(--line); color: var(--ink-3);
+      cursor: not-allowed;
+    }
+    .btn-ghost { border-color: transparent; }
+    .btn-ghost:hover { background: var(--bg-3); border-color: transparent; }
+
+    /* ─── Guest table ────────────────────────────────── */
+    .guest-table { flex: 1; overflow-y: auto; }
+    .gt-head, .gt-row {
+      display: grid;
+      grid-template-columns: 1.4fr 2fr 100px;
+      align-items: center;
+      padding: 8px 20px;
+      gap: 12px;
+    }
+    .gt-head {
+      font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--ink-3);
+      border-bottom: 1px solid var(--line-3);
+      background: var(--bg-2);
+      position: sticky; top: 0; z-index: 1;
+    }
+    .gt-row {
+      border-bottom: 1px solid var(--line-3);
+      transition: background 0.1s;
+    }
+    .gt-row:hover { background: var(--bg-2); }
+    .gt-row .name-cell {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--bg-3); border: 1px solid var(--line-2);
+      flex: 0 0 22px;
+    }
+    .guest-name { font-size: 12px; font-weight: 500; }
+    .tags-cell { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      display: inline-block; padding: 1px 6px;
+      border: 1px solid var(--line); border-radius: 3px;
+      font-size: 9px; color: var(--ink-2); background: var(--bg);
+    }
+    .form-tag {
+      font-size: 8px; padding: 1px 5px;
+      border: 1px dashed var(--line); border-radius: 3px;
+      color: var(--ink-3); background: transparent;
+    }
+    .form-tag.active {
+      border-style: solid; border-color: var(--ink);
+      color: var(--ink); background: var(--accent-soft);
+    }
+    .checkin-btn {
+      font: inherit; font-size: 10px; padding: 4px 10px;
+      border: 1px solid var(--line); border-radius: 4px;
+      background: var(--bg); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 4px;
+      transition: all 0.12s;
+    }
+    .checkin-btn:hover { border-color: var(--ink); background: var(--bg-2); }
+
+    .empty-state {
+      padding: 48px 20px; text-align: center; color: var(--ink-3);
+      font-size: 13px;
+    }
+    .empty-state .btn { margin-top: 12px; }
+
+    /* ─── Settings drawer ────────────────────────────── */
+    .drawer-backdrop {
+      position: fixed; inset: 0; z-index: 90;
+    }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 340px; z-index: 100;
+      background: var(--bg);
+      border-left: 1px solid var(--line);
+      box-shadow: -6px 0 24px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--line-3);
+      flex-shrink: 0;
+    }
+    .drawer-header h3 { font-size: 14px; font-weight: 600; }
+    .drawer-close {
+      width: 24px; height: 24px; border-radius: 4px;
+      border: none; background: transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink-3); font-size: 16px; transition: all 0.12s;
+    }
+    .drawer-close:hover { background: var(--bg-3); color: var(--ink); }
+    .drawer-body {
+      flex: 1; overflow-y: auto; padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .drawer-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--line-3);
+      display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .drawer-footer .btn { flex: 1; justify-content: center; padding: 8px 16px; }
+
+    /* Drawer sections */
+    .drawer-section {}
+    .drawer-section-title {
+      font-size: 12px; font-weight: 600; margin-bottom: 6px;
+    }
+    .drawer-section-desc {
+      font-size: 10px; color: var(--ink-3); margin-bottom: 10px; line-height: 1.4;
+    }
+
+    /* Presets row */
+    .presets { display: flex; gap: 6px; margin-bottom: 10px; }
+    .preset-btn {
+      font: inherit; font-size: 10px; padding: 3px 10px;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: var(--bg); color: var(--ink-2); cursor: pointer;
+      transition: all 0.12s;
+    }
+    .preset-btn:hover { border-color: var(--ink-3); }
+    .preset-btn.active {
+      background: var(--ink); color: white; border-color: var(--ink);
+    }
+
+    /* Form checkbox list */
+    .form-list { display: flex; flex-direction: column; gap: 5px; }
+    .form-check {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border: 1px solid var(--line-2);
+      border-radius: 6px; cursor: pointer;
+      transition: all 0.12s;
+    }
+    .form-check:hover { border-color: var(--ink-3); }
+    .form-check.checked {
+      border-color: var(--ink); background: var(--accent-soft);
+    }
+    .form-check.locked {
+      opacity: 0.5; cursor: not-allowed;
+    }
+    .checkbox {
+      width: 14px; height: 14px; border: 1.5px solid var(--line);
+      border-radius: 3px; flex: 0 0 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s;
+    }
+    .form-check.checked .checkbox {
+      background: var(--ink); border-color: var(--ink);
+    }
+    .form-check-info { flex: 1; }
+    .form-check-name { font-size: 11px; font-weight: 500; }
+    .form-check-meta { font-size: 9px; color: var(--ink-3); margin-top: 1px; }
+    .primary-badge {
+      font-size: 7px; font-weight: 700; letter-spacing: 0.08em;
+      background: var(--ink); color: white;
+      padding: 2px 5px; border-radius: 2px;
+    }
+    .lock-icon { font-size: 10px; color: var(--ink-3); }
+
+    /* Toggle rows in drawer */
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line-3);
+    }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-label { font-size: 11px; font-weight: 500; }
+    .setting-desc { font-size: 9px; color: var(--ink-3); margin-top: 1px; }
+    .toggle {
+      width: 28px; height: 16px; border-radius: 999px;
+      background: var(--line); position: relative;
+      cursor: pointer; flex: 0 0 28px;
+      transition: background 0.15s; border: none;
+    }
+    .toggle::after {
+      content: ''; width: 12px; height: 12px;
+      background: white; border-radius: 50%;
+      position: absolute; top: 2px; left: 2px;
+      transition: transform 0.15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .toggle.on { background: var(--green); }
+    .toggle.on::after { transform: translateX(12px); }
+
+    /* ─── Scanner view ───────────────────────────────── */
+    .scanner-layout {
+      display: grid; grid-template-columns: 240px 1fr;
+      flex: 1; overflow: hidden;
+    }
+    .scanner-sidebar {
+      border-right: 1px solid var(--line-3);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .scanner-sidebar h4 {
+      font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--ink-3);
+      margin: 0 0 10px; font-weight: 600;
+    }
+    .scanner-stage {
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px;
+      background: var(--bg-2); position: relative;
+    }
+    .camera-bar {
+      position: absolute; top: 14px; left: 14px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: var(--ink-2);
+    }
+    .camera-pill {
+      background: var(--bg); border: 1px solid var(--line);
+      padding: 4px 8px; border-radius: 4px; font-size: 10px;
+    }
+    .qr-frame {
+      width: 200px; height: 200px;
+      background: white; border: 1px solid var(--line);
+      position: relative;
+    }
+    .qr-corner {
+      position: absolute; width: 20px; height: 20px;
+      border: 2.5px solid var(--ink);
+    }
+    .qr-corner.tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+    .qr-corner.tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
+    .qr-corner.bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; }
+    .qr-corner.br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+    .qr-hint { font-size: 11px; color: var(--ink-3); }
+
+    .scan-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--line-3);
+    }
+    .scan-row:last-child { border-bottom: 0; }
+    .scan-dot {
+      width: 16px; height: 16px; border-radius: 4px;
+      background: var(--green-soft); border: 1px solid var(--green);
+      flex: 0 0 16px;
+    }
+    .scan-meta { flex: 1; }
+    .scan-name { font-size: 11px; font-weight: 500; }
+    .scan-time { font-size: 9px; color: var(--ink-3); }
+    .scan-status { font-size: 9px; color: var(--green); font-weight: 500; }
+
+    /* ─── Toast ──────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--ink); color: white;
+      padding: 10px 20px; border-radius: 8px;
+      font-size: 12px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 200; white-space: nowrap;
+      opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+      pointer-events: none;
+    }
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── Keyboard hint ──────────────────────────────── */
+    .kbd {
+      display: inline-block; padding: 1px 5px;
+      background: var(--bg-3); border: 1px solid var(--line);
+      border-radius: 3px; font-size: 9px; font-family: inherit;
+      color: var(--ink-3); font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ═══════════════════════════════════════════════════════════════
+// Data
+// ═══════════════════════════════════════════════════════════════
+
+const ALL_FORMS = [
+  { id: 'rsvp',    label: 'RSVP form',           short: 'RSVP',    count: 200, primary: true },
+  { id: 'plusone', label: 'Plus-one form',        short: '+1',      count: 64,  primary: false },
+  { id: 'dietary', label: 'Dietary preferences',  short: 'Dietary', count: 38,  primary: false },
+];
+
+const GUESTS = [
+  { name: 'Amy Santiago',      forms: ['rsvp'],              tags: ['Strategist', 'VIP'],           checkedIn: true },
+  { name: 'Charles Boyle',     forms: ['rsvp', 'plusone'],   tags: ['Inside Man', 'Participant'],   checkedIn: true },
+  { name: 'Jake Peralta',      forms: ['rsvp'],              tags: ['Double Agent', 'Mastermind'],  checkedIn: false },
+  { name: 'Kevin Cozner',      forms: ['rsvp'],              tags: ['Observer', 'Professor'],       checkedIn: false },
+  { name: 'Michael Hitchcock', forms: ['rsvp', 'dietary'],   tags: ['Observer'],                    checkedIn: true },
+  { name: 'Norm Scully',       forms: ['rsvp'],              tags: ['Observer', 'Sleepy Security'], checkedIn: false },
+  { name: 'Rosa Diaz',         forms: ['rsvp', 'plusone'],   tags: ['VIP', 'Saboteur'],             checkedIn: true },
+  { name: 'Terry Jeffords',    forms: ['rsvp', 'dietary'],   tags: ['VIP'],                         checkedIn: false },
+  { name: 'Gina Linetti',      forms: ['plusone'],            tags: ['Wildcard'],                    checkedIn: true },
+  { name: 'Raymond Holt',      forms: ['rsvp'],              tags: ['Commander', 'VIP'],            checkedIn: true },
+  { name: 'Adrian Pimento',    forms: ['rsvp', 'plusone', 'dietary'], tags: ['Wildcard'],            checkedIn: false },
+  { name: 'Sophia Perez',      forms: ['dietary'],           tags: ['Guest'],                       checkedIn: false },
+];
+
+const RECENT_SCANS = [
+  { name: 'Raymond Holt',    time: '9:10 AM', status: 'Checked in', form: 'RSVP' },
+  { name: 'Terry Jeffords',  time: '9:15 AM', status: 'Checked in', form: 'RSVP' },
+  { name: 'Gina Linetti',    time: '9:17 AM', status: 'Checked in', form: '+1' },
+  { name: 'Rosa Diaz',       time: '9:22 AM', status: 'Checked in', form: 'RSVP' },
+];
+
+const filterGuests = (formIds) =>
+  GUESTS.filter(g => g.forms.some(f => formIds.includes(f)));
+
+const scopeText = (formIds) => {
+  if (formIds.length === ALL_FORMS.length) return 'All forms';
+  if (formIds.length === 1) return ALL_FORMS.find(f => f.id === formIds[0])?.label || '';
+  return `${formIds.length} of ${ALL_FORMS.length}`;
+};
+
+const scopeCount = (formIds) => {
+  const guests = filterGuests(formIds);
+  return guests.length;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Icons
+// ═══════════════════════════════════════════════════════════════
+
+const SearchIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="7" cy="7" r="5" /><path d="M11 11l3.5 3.5" />
+  </svg>
+);
+const FilterIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+    <path d="M1 2h14L9.5 8.5V13l-3 1.5V8.5L1 2z" />
+  </svg>
+);
+const GearIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+    <circle cx="8" cy="8" r="2.5" />
+    <path d="M6.7 1.5h2.6l.3 1.8a5.5 5.5 0 0 1 1.3.8l1.7-.7 1.3 2.2-1.4 1.1a5.5 5.5 0 0 1 0 1.6l1.4 1.1-1.3 2.2-1.7-.7a5.5 5.5 0 0 1-1.3.8l-.3 1.8H6.7l-.3-1.8a5.5 5.5 0 0 1-1.3-.8l-1.7.7-1.3-2.2 1.4-1.1a5.5 5.5 0 0 1 0-1.6L2.1 5.6l1.3-2.2 1.7.7a5.5 5.5 0 0 1 1.3-.8l.3-1.8z" />
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+    <path d="M2 6l3 3 5-5" />
+  </svg>
+);
+const LockIcon = () => <span style={{ fontSize: 11 }}>🔒</span>;
+
+// ═══════════════════════════════════════════════════════════════
+// Navbar
+// ═══════════════════════════════════════════════════════════════
+
+const Navbar = ({ activeFormIds, drawerOpen, onToggleDrawer }) => {
+  const text = scopeText(activeFormIds);
+  const isMulti = activeFormIds.length > 1;
+
+  return (
+    <div className="nav">
+      <div className="nav-left">
+        <div className="logo" />
+        <span className="logo-text">rsvpify</span>
+      </div>
+      <div className="nav-right">
+        <span
+          className={'scope-badge' + (isMulti ? ' multi' : '')}
+          onClick={onToggleDrawer}
+          title="Click to change form scope (F)"
+        >
+          <span className="badge-label">Form</span>
+          <span>{text}</span>
+        </span>
+        <button
+          className={'gear-btn' + (drawerOpen ? ' active' : '')}
+          onClick={onToggleDrawer}
+          title="Check-in settings (F)"
+        >
+          <GearIcon />
+        </button>
+        <span className="user-pill">Jade Stewart ▾</span>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Settings Drawer
+// ═══════════════════════════════════════════════════════════════
+
+const SettingsDrawer = ({
+  open,
+  activeFormIds,
+  onApply,
+  onClose,
+  autoSwitch,
+  onAutoSwitchChange,
+  tagFilter,
+  onTagFilterChange,
+}) => {
+  const [staged, setStaged] = useState(activeFormIds);
+  const drawerRef = useRef(null);
+
+  useEffect(() => {
+    if (open) setStaged(activeFormIds);
+  }, [open]);
+
+  const toggle = (id) => {
+    setStaged(prev =>
+      prev.includes(id)
+        ? prev.filter(x => x !== id)
+        : [...prev, id]
+    );
+  };
+
+  const setPrimaryOnly = () => {
+    const primary = ALL_FORMS.find(f => f.primary);
+    if (primary) setStaged([primary.id]);
+  };
+
+  const setAllForms = () => setStaged(ALL_FORMS.map(f => f.id));
+
+  const hasChanges = JSON.stringify([...staged].sort()) !== JSON.stringify([...activeFormIds].sort());
+  const canApply = staged.length > 0;
+
+  const isPrimaryOnly = staged.length === 1 && ALL_FORMS.find(f => f.id === staged[0])?.primary;
+  const isAll = staged.length === ALL_FORMS.length;
+
+  const handleApply = () => {
+    if (canApply) onApply(staged);
+  };
+
+  const handleCancel = () => onClose();
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+      if (e.key === 'Enter' && canApply) { e.preventDefault(); handleApply(); }
+      const num = parseInt(e.key);
+      if (num >= 1 && num <= ALL_FORMS.length) {
+        e.preventDefault();
+        toggle(ALL_FORMS[num - 1].id);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, canApply, staged]);
+
+  return (
+    <>
+      {open && <div className="drawer-backdrop" onClick={onClose} />}
+      <div className={'drawer' + (open ? ' open' : '')} ref={drawerRef}>
+        <div className="drawer-header">
+          <h3>Check-in settings</h3>
+          <button className="drawer-close" onClick={onClose} title="Close (Esc)">×</button>
+        </div>
+
+        <div className="drawer-body">
+          <div className="drawer-section">
+            <div className="drawer-section-title">Form scope</div>
+            <div className="drawer-section-desc">
+              Choose which forms feed this check-in. Affects who appears in the guest list.
+            </div>
+
+            <div className="presets">
+              <button
+                className={'preset-btn' + (isPrimaryOnly ? ' active' : '')}
+                onClick={setPrimaryOnly}
+              >
+                Primary only
+              </button>
+              <button
+                className={'preset-btn' + (isAll ? ' active' : '')}
+                onClick={setAllForms}
+              >
+                All forms
+              </button>
+            </div>
+
+            <div className="form-list">
+              {ALL_FORMS.map((f, i) => (
+                <div
+                  key={f.id}
+                  className={'form-check' + (staged.includes(f.id) ? ' checked' : '')}
+                  onClick={() => toggle(f.id)}
+                >
+                  <div className="checkbox">
+                    {staged.includes(f.id) && <CheckIcon />}
+                  </div>
+                  <div className="form-check-info">
+                    <div className="form-check-name">{f.label}</div>
+                    <div className="form-check-meta">{f.count} guests</div>
+                  </div>
+                  {f.primary && <span className="primary-badge">PRIMARY</span>}
+                  <span className="kbd" style={{ marginLeft: 'auto' }}>{i + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="drawer-section">
+            <div className="drawer-section-title">Other settings</div>
+            <div className="setting-row">
+              <div>
+                <div className="setting-label">Auto-switch mode</div>
+                <div className="setting-desc">Switches between check-in and check-out automatically.</div>
+              </div>
+              <button
+                className={'toggle' + (autoSwitch ? ' on' : '')}
+                onClick={() => onAutoSwitchChange(!autoSwitch)}
+              />
+            </div>
+            <div className="setting-row">
+              <div>
+                <div className="setting-label">Tag filter</div>
+                <div className="setting-desc">Only check in guests with selected tags.</div>
+              </div>
+              <button
+                className={'toggle' + (tagFilter ? ' on' : '')}
+                onClick={() => onTagFilterChange(!tagFilter)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="drawer-footer">
+          <button className="btn btn-ghost" onClick={handleCancel}>Cancel</button>
+          <button
+            className="btn btn-primary"
+            disabled={!canApply}
+            onClick={handleApply}
+          >
+            {hasChanges ? 'Apply' : 'Done'}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Manage Guests Screen
+// ═══════════════════════════════════════════════════════════════
+
+const ManageGuestsScreen = ({ activeFormIds, onOpenDrawer }) => {
+  const guests = filterGuests(activeFormIds);
+  const checkedIn = guests.filter(g => g.checkedIn).length;
+
+  return (
+    <>
+      <div className="toolbar">
+        <div className="toolbar-left">
+          <strong>Manage Guests</strong>
+        </div>
+        <div className="toolbar-right">
+          <div className="search-box">
+            <SearchIcon />
+            <span>Search by name…</span>
+          </div>
+          <button className="btn"><FilterIcon /> Filters</button>
+        </div>
+      </div>
+
+      <div className="stats">
+        <div className="stat">
+          <div className="stat-label">All guests</div>
+          <div className="stat-val">{guests.length}<span className="stat-pct">/{GUESTS.length}</span></div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Checked in</div>
+          <div className="stat-val">{checkedIn}<span className="stat-pct">/{guests.length}</span></div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Not checked in</div>
+          <div className="stat-val">{guests.length - checkedIn}</div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Checked out</div>
+          <div className="stat-val">0</div>
+        </div>
+      </div>
+
+      <div className="guest-table">
+        <div className="gt-head">
+          <span>Guest name ↓</span>
+          <span>Forms / Tags</span>
+          <span></span>
+        </div>
+        {guests.length === 0 ? (
+          <div className="empty-state">
+            No guests in selected forms.
+            <br />
+            <button className="btn" onClick={onOpenDrawer}>Adjust form scope</button>
+          </div>
+        ) : (
+          guests.map(g => (
+            <div className="gt-row" key={g.name}>
+              <div className="name-cell">
+                <div className="avatar" />
+                <span className="guest-name">{g.name}</span>
+              </div>
+              <div className="tags-cell">
+                {g.forms.map(fid => {
+                  const f = ALL_FORMS.find(x => x.id === fid);
+                  const active = activeFormIds.includes(fid);
+                  return <span key={fid} className={'form-tag' + (active ? ' active' : '')}>{f.short}</span>;
+                })}
+                {g.tags.slice(0, 2).map(t => <span key={t} className="tag">{t}</span>)}
+              </div>
+              <div>
+                <button className="checkin-btn">
+                  {g.checkedIn ? '✓ Checked in' : 'Check-in →'}
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Scanner Screen
+// ═══════════════════════════════════════════════════════════════
+
+const ScannerScreen = ({ activeFormIds }) => {
+  const eligible = filterGuests(activeFormIds);
+  const filteredScans = RECENT_SCANS.filter(s => {
+    const formId = ALL_FORMS.find(f => f.short === s.form)?.id;
+    return !formId || activeFormIds.includes(formId);
+  });
+
+  return (
+    <div className="scanner-layout">
+      <div className="scanner-sidebar">
+        <h4>Scan settings</h4>
+        <div className="setting-row">
+          <div>
+            <div className="setting-label">Auto-switch mode</div>
+            <div className="setting-desc">Auto check-in/out.</div>
+          </div>
+          <button className="toggle" />
+        </div>
+        <div className="setting-row">
+          <div>
+            <div className="setting-label">Tag filter</div>
+            <div className="setting-desc">Filter by tags.</div>
+          </div>
+          <button className="toggle" />
+        </div>
+
+        <h4 style={{ marginTop: 18 }}>Recent scans · {eligible.length} eligible</h4>
+        {filteredScans.map(s => (
+          <div className="scan-row" key={s.name}>
+            <div className="scan-dot" />
+            <div className="scan-meta">
+              <div className="scan-name">{s.name}</div>
+              <div className="scan-time">{s.time} · {s.form}</div>
+            </div>
+            <span className="scan-status">{s.status}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="scanner-stage">
+        <div className="camera-bar">
+          <span>Camera</span>
+          <span className="camera-pill">Facetime HD ▾</span>
+        </div>
+        <div className="qr-frame">
+          <div className="qr-corner tl" />
+          <div className="qr-corner tr" />
+          <div className="qr-corner bl" />
+          <div className="qr-corner br" />
+        </div>
+        <div className="qr-hint">Position QR code within the frame</div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Toast
+// ═══════════════════════════════════════════════════════════════
+
+const Toast = ({ message, visible }) => (
+  <div className={'toast' + (visible ? ' visible' : '')}>{message}</div>
+);
+
+// ═══════════════════════════════════════════════════════════════
+// App
+// ═══════════════════════════════════════════════════════════════
+
+const App = () => {
+  const [screen, setScreen] = useState('manage');
+  const [activeFormIds, setActiveFormIds] = useState(['rsvp']);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [autoSwitch, setAutoSwitch] = useState(false);
+  const [tagFilter, setTagFilter] = useState(true);
+  const [toast, setToast] = useState({ message: '', visible: false });
+
+  const showToast = (msg) => {
+    setToast({ message: msg, visible: true });
+    setTimeout(() => setToast(t => ({ ...t, visible: false })), 2500);
+  };
+
+  const handleApply = (newFormIds) => {
+    setActiveFormIds(newFormIds);
+    setDrawerOpen(false);
+    const count = scopeCount(newFormIds);
+    showToast(`Now showing ${scopeText(newFormIds)} (${count} guests).`);
+  };
+
+  const toggleDrawer = useCallback(() => {
+    setDrawerOpen(prev => !prev);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (drawerOpen) return;
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleDrawer();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [drawerOpen, toggleDrawer]);
+
+  return (
+    <div className="app">
+      <div className="demo-bar">
+        <span>Screen:</span>
+        <button className={screen === 'manage' ? 'active' : ''} onClick={() => setScreen('manage')}>
+          Manage Guests
+        </button>
+        <button className={screen === 'scanner' ? 'active' : ''} onClick={() => setScreen('scanner')}>
+          QR Scan
+        </button>
+        <span style={{ marginLeft: 16, opacity: 0.5 }}>
+          Press <span className="kbd" style={{ background: 'rgba(255,255,255,0.15)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}>F</span> to toggle settings
+        </span>
+      </div>
+
+      <Navbar
+        activeFormIds={activeFormIds}
+        drawerOpen={drawerOpen}
+        onToggleDrawer={toggleDrawer}
+      />
+
+      <div className="page-head">
+        <div className="crumb">← {screen === 'scanner' ? 'Back to Event' : 'Back to Manage Guests'}</div>
+        <h2 className="event-title">Halloween Heist 2025</h2>
+        <div className="event-meta">
+          {screen === 'scanner'
+            ? <span>Scan check-in</span>
+            : <><span>Parque Arauco</span><span>19:00 – 22:00</span></>
+          }
+        </div>
+      </div>
+
+      {screen === 'manage'
+        ? <ManageGuestsScreen activeFormIds={activeFormIds} onOpenDrawer={() => setDrawerOpen(true)} />
+        : <ScannerScreen activeFormIds={activeFormIds} />
+      }
+
+      <SettingsDrawer
+        open={drawerOpen}
+        activeFormIds={activeFormIds}
+        onApply={handleApply}
+        onClose={() => setDrawerOpen(false)}
+        autoSwitch={autoSwitch}
+        onAutoSwitchChange={setAutoSwitch}
+        tagFilter={tagFilter}
+        onTagFilterChange={setTagFilter}
+      />
+
+      <Toast message={toast.message} visible={toast.visible} />
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
