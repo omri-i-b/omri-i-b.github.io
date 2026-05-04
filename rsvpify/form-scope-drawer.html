@@ -609,16 +609,7 @@ const Navbar = ({ activeFormIds, drawerOpen, onToggleDrawer }) => {
 // Settings Drawer
 // ═══════════════════════════════════════════════════════════════
 
-const SettingsDrawer = ({
-  open,
-  activeFormIds,
-  onApply,
-  onClose,
-  autoSwitch,
-  onAutoSwitchChange,
-  tagFilter,
-  onTagFilterChange,
-}) => {
+const SettingsDrawer = ({ open, activeFormIds, onApply, onClose }) => {
   const [staged, setStaged] = useState(activeFormIds);
   const drawerRef = useRef(null);
 
@@ -673,14 +664,13 @@ const SettingsDrawer = ({
       {open && <div className="drawer-backdrop" onClick={onClose} />}
       <div className={'drawer' + (open ? ' open' : '')} ref={drawerRef}>
         <div className="drawer-header">
-          <h3>Check-in settings</h3>
+          <h3>Form scope</h3>
           <button className="drawer-close" onClick={onClose} title="Close (Esc)">×</button>
         </div>
 
         <div className="drawer-body">
           <div className="drawer-section">
-            <div className="drawer-section-title">Form scope</div>
-            <div className="drawer-section-desc">
+            <div className="drawer-section-desc" style={{ marginTop: -4 }}>
               Choose which forms feed this check-in. Affects who appears in the guest list.
             </div>
 
@@ -720,29 +710,6 @@ const SettingsDrawer = ({
             </div>
           </div>
 
-          <div className="drawer-section">
-            <div className="drawer-section-title">Other settings</div>
-            <div className="setting-row">
-              <div>
-                <div className="setting-label">Auto-switch mode</div>
-                <div className="setting-desc">Switches between check-in and check-out automatically.</div>
-              </div>
-              <button
-                className={'toggle' + (autoSwitch ? ' on' : '')}
-                onClick={() => onAutoSwitchChange(!autoSwitch)}
-              />
-            </div>
-            <div className="setting-row">
-              <div>
-                <div className="setting-label">Tag filter</div>
-                <div className="setting-desc">Only check in guests with selected tags.</div>
-              </div>
-              <button
-                className={'toggle' + (tagFilter ? ' on' : '')}
-                onClick={() => onTagFilterChange(!tagFilter)}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="drawer-footer">
@@ -846,7 +813,7 @@ const ManageGuestsScreen = ({ activeFormIds, onOpenDrawer }) => {
 // Scanner Screen
 // ═══════════════════════════════════════════════════════════════
 
-const ScannerScreen = ({ activeFormIds }) => {
+const ScannerScreen = ({ activeFormIds, autoSwitch, onAutoSwitchChange, tagFilter, onTagFilterChange }) => {
   const eligible = filterGuests(activeFormIds);
   const filteredScans = RECENT_SCANS.filter(s => {
     const formId = ALL_FORMS.find(f => f.short === s.form)?.id;
@@ -856,7 +823,29 @@ const ScannerScreen = ({ activeFormIds }) => {
   return (
     <div className="scanner-layout">
       <div className="scanner-sidebar">
-        <h4>Recent scans · {eligible.length} eligible</h4>
+        <h4>Scan settings</h4>
+        <div className="setting-row">
+          <div>
+            <div className="setting-label">Auto-switch mode</div>
+            <div className="setting-desc">Switches between check-in and check-out automatically.</div>
+          </div>
+          <button
+            className={'toggle' + (autoSwitch ? ' on' : '')}
+            onClick={() => onAutoSwitchChange(!autoSwitch)}
+          />
+        </div>
+        <div className="setting-row">
+          <div>
+            <div className="setting-label">Tag filter</div>
+            <div className="setting-desc">Only check in guests with selected tags.</div>
+          </div>
+          <button
+            className={'toggle' + (tagFilter ? ' on' : '')}
+            onClick={() => onTagFilterChange(!tagFilter)}
+          />
+        </div>
+
+        <h4 style={{ marginTop: 18 }}>Recent scans · {eligible.length} eligible</h4>
         {filteredScans.map(s => (
           <div className="scan-row" key={s.name}>
             <div className="scan-dot" />
@@ -969,7 +958,13 @@ const App = () => {
 
       {screen === 'manage'
         ? <ManageGuestsScreen activeFormIds={activeFormIds} onOpenDrawer={() => setDrawerOpen(true)} />
-        : <ScannerScreen activeFormIds={activeFormIds} />
+        : <ScannerScreen
+            activeFormIds={activeFormIds}
+            autoSwitch={autoSwitch}
+            onAutoSwitchChange={setAutoSwitch}
+            tagFilter={tagFilter}
+            onTagFilterChange={setTagFilter}
+          />
       }
 
       <SettingsDrawer
@@ -977,10 +972,6 @@ const App = () => {
         activeFormIds={activeFormIds}
         onApply={handleApply}
         onClose={() => setDrawerOpen(false)}
-        autoSwitch={autoSwitch}
-        onAutoSwitchChange={setAutoSwitch}
-        tagFilter={tagFilter}
-        onTagFilterChange={setTagFilter}
       />
 
       <Toast message={toast.message} visible={toast.visible} />
