@@ -2146,13 +2146,20 @@
             <!-- Page header -->
             <div>
               <div class="text-xl font-600">Registration</div>
-              <div class="text-sm text-muted" style="margin-top: 2px;">Configure what guests see and fill in when they register.</div>
+              <div class="text-sm text-muted" style="margin-top: 2px;">Configure the questions guests answer when they register. Every registration creates a ticket.</div>
+            </div>
+
+            <!-- How it works callout -->
+            <div style="padding: 12px 16px; background: var(--accent-light); border-radius: var(--radius-lg); border: 1px solid rgba(114,91,217,0.15); display: flex; align-items: flex-start; gap: 10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <div class="text-sm" style="color: var(--ink);">
+                <strong>Per ticket</strong> questions are asked for each ticket purchased (e.g. name, dietary). <strong>Per registration</strong> questions are asked once per form submission (e.g. "how did you hear?"). Manage ticket types and pricing in <a href="#" onclick="event.preventDefault(); switchEditorTab('tickets')" style="color: var(--accent); font-weight: 500;">Tickets</a>.
+              </div>
             </div>
 
             <!-- Settings card -->
             <div class="card" style="padding: 0;">
-              <!-- Registration status -->
-              <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
+              <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
                 <div>
                   <div class="text-sm font-500">Registration</div>
                   <div class="text-xs text-muted" style="margin-top: 1px;">Allow new guests to register</div>
@@ -2162,24 +2169,17 @@
                   <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 10px; font-size: 11px;">Closed</div>
                 </div>
               </div>
-              <!-- Capacity -->
-              <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
-                <div>
-                  <div class="text-sm font-500">Capacity</div>
-                  <div class="text-xs text-muted" style="margin-top: 1px;">Maximum number of guests</div>
-                </div>
-                <input class="input" value="200" style="width: 70px; text-align: center; font-size: 13px; padding: 4px 8px;">
-              </div>
             </div>
 
-            <!-- Personal fields -->
+            <!-- Per-ticket fields -->
             <div>
-              <div class="reg-group-label">Personal Fields</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">Collected for every registrant.</div>
+              <div class="reg-group-label">Per-ticket fields</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">Asked for every ticket. If someone buys 3 tickets, they fill these in 3 times.</div>
               <div class="reg-field-row">
                 <div class="reg-field">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
                   <span class="reg-field-name">Name</span>
+                  <span class="q-badge q-badge-person" style="margin-left: auto;">Per ticket</span>
                   <div class="q-chips" style="gap: 4px;">
                     <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Full Name</div>
                     <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">First + Last</div>
@@ -2188,11 +2188,13 @@
                 <div class="reg-field">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
                   <span class="reg-field-name">Email</span>
+                  <span class="q-badge q-badge-person" style="margin-left: auto;">Per ticket</span>
                   <span class="text-xs text-muted">Required</span>
                 </div>
                 <div class="reg-field">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
                   <span class="reg-field-name">Phone</span>
+                  <span class="q-badge q-badge-person" style="margin-left: auto;">Per ticket</span>
                   <div class="q-chips" style="gap: 4px;">
                     <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Off</div>
                     <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Optional</div>
@@ -2202,47 +2204,10 @@
               </div>
             </div>
 
-            <!-- Additional Guests -->
-            <div>
-              <div class="reg-group-label">Additional Guests</div>
-              <div class="card" style="padding: 0;">
-                <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
-                  <div>
-                    <div class="text-sm font-500">Allow registrants to add guests</div>
-                    <div class="text-xs text-muted" style="margin-top:2px;">Each person can register additional attendees alongside themselves</div>
-                  </div>
-                  <div class="toggle on" onclick="togglePlusOnes(this)"><div class="toggle-knob"></div></div>
-                </div>
-                <div id="plusOneConfig" style="border-top: 1px solid var(--line);">
-                  <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
-                    <span class="text-sm">Max additional guests</span>
-                    <div class="q-chips" style="gap: 4px;">
-                      <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">1</div>
-                      <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">2</div>
-                      <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">3</div>
-                      <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">5</div>
-                      <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">∞</div>
-                    </div>
-                  </div>
-                  <div style="padding: 0 16px 12px 16px;">
-                    <div class="text-xs font-500" style="margin-bottom: 6px; color: var(--muted);">Collect for each additional guest:</div>
-                    <div class="flex gap-8 flex-wrap">
-                      <label class="check" style="gap:4px;"><span class="check-box checked" onclick="this.classList.toggle('checked')"></span><span class="text-xs">Name</span></label>
-                      <label class="check" style="gap:4px;"><span class="check-box checked" onclick="this.classList.toggle('checked')"></span><span class="text-xs">Email</span></label>
-                      <label class="check" style="gap:4px;"><span class="check-box" onclick="this.classList.toggle('checked')"></span><span class="text-xs">Phone</span></label>
-                    </div>
-                  </div>
-                  <div style="padding: 10px 16px; background: var(--bg-subtle); border-top: 1px solid var(--line); border-radius: 0 0 var(--radius-md) var(--radius-md);">
-                    <div class="text-xs text-muted">Additional guests will also be asked all questions marked as <strong>per person</strong> below.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Questions -->
             <div>
               <div class="reg-group-label">Questions</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">Custom questions on the registration form. Mark as "per person" to repeat for each additional guest.</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">Custom questions on the registration form. Toggle scope to control whether they're asked per ticket or once per registration.</div>
               <div class="flex flex-col" style="gap: 8px;">
 
                 <!-- Question 1: Meal preference — EXPANDED -->
@@ -2312,13 +2277,16 @@
                       </div>
                     </div>
 
-                    <!-- Per person toggle -->
+                    <!-- Scope toggle -->
                     <div class="q-per-person-row">
                       <div>
-                        <div class="text-sm font-500">Per person</div>
-                        <div class="text-xs text-muted" style="margin-top: 2px;">Ask each attendee including additional guests</div>
+                        <div class="text-sm font-500">Scope</div>
+                        <div class="text-xs text-muted" style="margin-top: 2px;">Per ticket = asked for each ticket. Per registration = asked once.</div>
                       </div>
-                      <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                      <div class="q-chips">
+                        <div class="q-chip active" onclick="selectChip(this)">Per ticket</div>
+                        <div class="q-chip" onclick="selectChip(this)">Per registration</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2328,7 +2296,7 @@
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">Dietary restrictions</span>
-                    <span class="q-badge q-badge-person">Per person</span>
+                    <span class="q-badge q-badge-person">Per ticket</span>
                     <span class="q-badge q-badge-type">Short text</span>
                     <span class="q-badge q-badge-optional">Optional</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2340,29 +2308,31 @@
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">T-shirt size</span>
-                    <span class="q-badge q-badge-person">Per person</span>
+                    <span class="q-badge q-badge-person">Per ticket</span>
                     <span class="q-badge q-badge-type">Dropdown</span>
                     <span class="q-badge q-badge-optional">Optional</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
 
-                <!-- Question 4: How did you hear — collapsed (no per-person) -->
+                <!-- Question 4: How did you hear — per registration -->
                 <div class="q-card" onclick="expandQuestion(this)">
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">How did you hear about this event?</span>
+                    <span class="q-badge" style="background: #f0fdf4; color: #16a34a; border-color: #bbf7d0;">Per registration</span>
                     <span class="q-badge q-badge-type">Dropdown</span>
                     <span class="q-badge q-badge-optional">Optional</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
 
-                <!-- Question 5: Accessibility needs — collapsed (no per-person) -->
+                <!-- Question 5: Accessibility needs — per registration -->
                 <div class="q-card" onclick="expandQuestion(this)">
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">Accessibility needs</span>
+                    <span class="q-badge" style="background: #f0fdf4; color: #16a34a; border-color: #bbf7d0;">Per registration</span>
                     <span class="q-badge q-badge-type">Short text</span>
                     <span class="q-badge q-badge-optional">Optional</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2385,9 +2355,17 @@
             <div class="flex justify-between items-end">
               <div>
                 <div class="text-xl font-600">Tickets</div>
-                <div class="text-sm text-muted" style="margin-top: 2px;">Manage ticket types, pricing, and capacity for this event.</div>
+                <div class="text-sm text-muted" style="margin-top: 2px;">Every registration is a ticket. Free events use a $0 ticket by default.</div>
               </div>
-              <button class="btn btn-sm btn-primary" onclick="addTicketType()">+ Add ticket</button>
+              <button class="btn btn-sm btn-primary" onclick="addTicketType()">+ Add ticket type</button>
+            </div>
+
+            <!-- How tickets work -->
+            <div style="padding: 12px 16px; background: var(--accent-light); border-radius: var(--radius-lg); border: 1px solid rgba(114,91,217,0.15); display: flex; align-items: flex-start; gap: 10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <div class="text-sm" style="color: var(--ink);">
+                Guests select a ticket type when they register. To bring additional guests, they purchase multiple tickets. Questions marked <strong>per ticket</strong> in <a href="#" onclick="event.preventDefault(); switchEditorTab('form')" style="color: var(--accent); font-weight: 500;">Registration</a> are asked for each ticket. Use ticket types for sessions, VIP tiers, or companion tickets.
+              </div>
             </div>
 
             <!-- Ticket Types Table -->
@@ -2395,9 +2373,9 @@
               <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                 <thead>
                   <tr style="border-bottom: 1px solid var(--line); background: var(--bg-subtle);">
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Name</th>
+                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Ticket type</th>
                     <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Price</th>
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Qty</th>
+                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Limit</th>
                     <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Sold</th>
                     <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Status</th>
                     <th style="width: 40px;"></th>
@@ -2405,7 +2383,10 @@
                 </thead>
                 <tbody id="ticketTypesBody">
                   <tr class="ticket-table-row">
-                    <td style="padding: 10px 14px;"><input class="input" value="General Admission" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
+                    <td style="padding: 10px 14px;">
+                      <input class="input" value="General Admission" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
+                      <div class="text-xs text-muted" style="margin-top: 1px;">Default ticket for all attendees</div>
+                    </td>
                     <td style="padding: 10px 14px;"><input class="input" value="$40" style="border:none; padding:0; background:transparent; width:60px;"></td>
                     <td style="padding: 10px 14px;"><input class="input" value="200" style="border:none; padding:0; background:transparent; width:50px;"></td>
                     <td style="padding: 10px 14px; color: var(--muted);">142</td>
@@ -2413,36 +2394,47 @@
                     <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                   </tr>
                   <tr class="ticket-table-row">
-                    <td style="padding: 10px 14px;"><input class="input" value="Plus-one" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="$25" style="border:none; padding:0; background:transparent; width:60px;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="100" style="border:none; padding:0; background:transparent; width:50px;"></td>
-                    <td style="padding: 10px 14px; color: var(--muted);">38</td>
+                    <td style="padding: 10px 14px;">
+                      <input class="input" value="VIP Dinner" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
+                      <div class="text-xs text-muted" style="margin-top: 1px;">Includes pre-event dinner at 6 PM</div>
+                    </td>
+                    <td style="padding: 10px 14px;"><input class="input" value="$100" style="border:none; padding:0; background:transparent; width:60px;"></td>
+                    <td style="padding: 10px 14px;"><input class="input" value="40" style="border:none; padding:0; background:transparent; width:50px;"></td>
+                    <td style="padding: 10px 14px; color: var(--muted);">28</td>
                     <td style="padding: 10px 14px;"><span class="tag tag-active">On sale</span></td>
                     <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                   </tr>
-                  <tr class="ticket-table-row" style="opacity: 0.5;">
-                    <td style="padding: 10px 14px;"><input class="input" value="Comp - Staff" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="$0" style="border:none; padding:0; background:transparent; width:60px;"></td>
+                  <tr class="ticket-table-row">
+                    <td style="padding: 10px 14px;">
+                      <input class="input" value="Comp" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
+                      <div class="text-xs text-muted" style="margin-top: 1px;">Staff and speaker passes</div>
+                    </td>
+                    <td style="padding: 10px 14px; color: var(--muted); font-size: 12px;">Free</td>
                     <td style="padding: 10px 14px;"><input class="input" value="20" style="border:none; padding:0; background:transparent; width:50px;"></td>
                     <td style="padding: 10px 14px; color: var(--muted);">14</td>
-                    <td style="padding: 10px 14px;"><span class="tag tag-muted">Sold out</span></td>
+                    <td style="padding: 10px 14px;"><span class="tag tag-active">On sale</span></td>
                     <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <!-- Settings Cards -->
-            <div class="card" style="padding: 14px;">
-              <div class="flex justify-between items-center">
-                <div>
-                  <div class="text-sm font-600">Total capacity</div>
-                  <div class="text-sm text-muted">Maximum guests across all ticket types</div>
-                </div>
-                <input class="input" value="200" style="width: 80px; text-align: center;">
+            <!-- Ticket summary -->
+            <div class="card" style="padding: 14px; background: var(--bg-subtle);">
+              <div class="flex justify-between items-center" style="margin-bottom: 8px;">
+                <span class="text-sm font-600">Capacity</span>
+                <span class="text-sm font-600">260 total across all types</span>
+              </div>
+              <div style="height: 5px; background: var(--border-light); border-radius: 4px;">
+                <div style="height: 100%; width: 71%; background: var(--accent); border-radius: 4px;"></div>
+              </div>
+              <div class="flex justify-between" style="margin-top: 4px;">
+                <span class="text-xs text-muted">184 sold</span>
+                <span class="text-xs text-muted">76 remaining</span>
               </div>
             </div>
 
+            <!-- Settings -->
             <div class="card" style="padding: 14px;">
               <div class="toggle-row">
                 <div>
@@ -2456,8 +2448,8 @@
             <div class="card" style="padding: 14px;">
               <div class="toggle-row">
                 <div>
-                  <div class="toggle-label">Charge for this event</div>
-                  <div class="toggle-hint">Connect Stripe to accept payments</div>
+                  <div class="toggle-label">Collect payment</div>
+                  <div class="toggle-hint">Connect Stripe to charge for paid tickets</div>
                 </div>
                 <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
               </div>
@@ -2471,6 +2463,23 @@
                   </div>
                 </div>
                 <button class="btn btn-sm btn-ghost">Disconnect</button>
+              </div>
+            </div>
+
+            <!-- Max per registration -->
+            <div class="card" style="padding: 14px;">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="text-sm font-600">Max tickets per registration</div>
+                  <div class="text-sm text-muted">How many tickets one person can buy at once</div>
+                </div>
+                <div class="q-chips" style="gap: 4px;">
+                  <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">1</div>
+                  <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">2</div>
+                  <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">5</div>
+                  <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">10</div>
+                  <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">∞</div>
+                </div>
               </div>
             </div>
           </div>
