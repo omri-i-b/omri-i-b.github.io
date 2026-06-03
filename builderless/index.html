@@ -2142,10 +2142,10 @@
             <!-- Page header -->
             <div class="flex justify-between items-end">
               <div>
-                <div class="text-xl font-600" id="regTitle">Registration</div>
-                <div class="text-sm text-muted" style="margin-top: 2px;" id="regSubtitle">Configure your registration form, RSVP types, and questions.</div>
+                <div class="text-xl font-600">Registration</div>
+                <div class="text-sm text-muted" style="margin-top: 2px;">Configure registration types, questions, and pricing.</div>
               </div>
-              <button class="btn btn-sm btn-primary" id="regAddTypeBtn" onclick="addTicketType()">+ Add RSVP type</button>
+              <button class="btn btn-sm btn-primary" onclick="addTicketType()">+ Add type</button>
             </div>
 
             <!-- Mode toggle: Free ↔ Paid -->
@@ -2191,16 +2191,16 @@
 
             <!-- ═══ RSVP TYPES TABLE (free mode) ═══ -->
             <div id="rsvpTypesSection">
-              <div class="reg-group-label" id="typesLabel">RSVP types</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;" id="typesHint">Different ways guests can register. Each type can have its own capacity limit.</div>
+              <div class="reg-group-label">Registration types</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">Different ways guests can register. Each type can have its own capacity and price.</div>
               <div class="card" style="padding: 0;" id="ticketTypesCard">
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                   <thead>
                     <tr style="border-bottom: 1px solid var(--line); background: var(--bg-subtle);">
-                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;" id="colName">Type</th>
+                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Type</th>
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px; display: none;" id="colPrice">Price</th>
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Limit</th>
-                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;" id="colCount">RSVPs</th>
+                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Registered</th>
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Status</th>
                       <th style="width: 40px;"></th>
                     </tr>
@@ -2214,7 +2214,7 @@
                       <td style="padding: 10px 14px; display: none;" class="price-col"><input class="input" value="$40" style="border:none; padding:0; background:transparent; width:60px;"></td>
                       <td style="padding: 10px 14px;"><input class="input" value="200" style="border:none; padding:0; background:transparent; width:50px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">142</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active" id="statusTag0">Open</span></td>
+                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                     <tr class="ticket-table-row">
@@ -2225,7 +2225,7 @@
                       <td style="padding: 10px 14px; display: none;" class="price-col"><input class="input" value="$100" style="border:none; padding:0; background:transparent; width:60px;"></td>
                       <td style="padding: 10px 14px;"><input class="input" value="40" style="border:none; padding:0; background:transparent; width:50px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">28</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active" id="statusTag1">Open</span></td>
+                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                     <tr class="ticket-table-row">
@@ -2236,7 +2236,7 @@
                       <td style="padding: 10px 14px; display: none;" class="price-col"><span style="color: var(--muted); font-size: 12px;">Free</span></td>
                       <td style="padding: 10px 14px;"><input class="input" value="20" style="border:none; padding:0; background:transparent; width:50px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">14</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active" id="statusTag2">Open</span></td>
+                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                   </tbody>
@@ -2260,8 +2260,8 @@
               <div class="card" style="padding: 14px; margin-top: 8px;">
                 <div class="flex justify-between items-center">
                   <div>
-                    <div class="text-sm font-600" id="maxLabel">Max guests per registration</div>
-                    <div class="text-sm text-muted" id="maxHint">How many spots one person can reserve at once</div>
+                    <div class="text-sm font-600">Max per registration</div>
+                    <div class="text-sm text-muted">How many guests one person can register at once</div>
                   </div>
                   <div class="q-chips" style="gap: 4px;">
                     <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">1</div>
@@ -3727,56 +3727,13 @@
     // ═══ PRICING MODE TOGGLE (Free ↔ Paid) ═══
     function togglePricingMode(mode) {
       var isPaid = mode === 'paid';
-      // Header
-      document.getElementById('regTitle').textContent = isPaid ? 'Tickets & Registration' : 'Registration';
-      document.getElementById('regSubtitle').textContent = isPaid
-        ? 'Configure ticket types, pricing, and registration questions.'
-        : 'Configure your registration form, RSVP types, and questions.';
-      document.getElementById('regAddTypeBtn').textContent = isPaid ? '+ Add ticket type' : '+ Add RSVP type';
-      // Pricing hint
+      // Show/hide price column + Stripe — that's it
       document.getElementById('pricingHint').textContent = isPaid
-        ? 'Paid event — guests purchase tickets to register'
-        : 'Free event — guests RSVP to reserve their spot';
-      // Stripe row
+        ? 'Guests pay when they register'
+        : 'Free — guests RSVP to reserve a spot';
       document.getElementById('stripeRow').style.display = isPaid ? 'block' : 'none';
-      // Table columns
-      document.getElementById('colName').textContent = isPaid ? 'Ticket type' : 'Type';
       document.getElementById('colPrice').style.display = isPaid ? '' : 'none';
-      document.getElementById('colCount').textContent = isPaid ? 'Sold' : 'RSVPs';
       document.querySelectorAll('.price-col').forEach(function(c) { c.style.display = isPaid ? '' : 'none'; });
-      // Status tags
-      document.querySelectorAll('[id^="statusTag"]').forEach(function(t) { t.textContent = isPaid ? 'On sale' : 'Open'; });
-      // Section labels
-      document.getElementById('typesLabel').textContent = isPaid ? 'Ticket types' : 'RSVP types';
-      document.getElementById('typesHint').textContent = isPaid
-        ? 'Different ticket tiers guests can purchase. Each type has its own price and capacity.'
-        : 'Different ways guests can register. Each type can have its own capacity limit.';
-      // Max per reg
-      document.getElementById('maxLabel').textContent = isPaid ? 'Max tickets per order' : 'Max guests per registration';
-      document.getElementById('maxHint').textContent = isPaid
-        ? 'How many tickets one person can buy at once'
-        : 'How many spots one person can reserve at once';
-      // Per-guest vs per-ticket labels
-      var guestWord = isPaid ? 'ticket' : 'guest';
-      document.getElementById('perGuestLabel').textContent = isPaid ? 'Per-ticket fields' : 'Per-guest fields';
-      document.getElementById('perGuestHint').textContent = isPaid
-        ? 'Asked for every ticket. If someone buys 3 tickets, they fill these 3 times.'
-        : 'Asked for every guest. If someone registers 3 guests, they fill these 3 times.';
-      document.querySelectorAll('[id^="badgePerGuest"]').forEach(function(b) { b.textContent = 'Per ' + guestWord; });
-      document.querySelectorAll('.per-guest-badge').forEach(function(b) { b.textContent = 'Per ' + guestWord; });
-      document.querySelectorAll('.scope-per-guest').forEach(function(b) { b.textContent = 'Per ' + guestWord; });
-      document.querySelectorAll('.scope-hint').forEach(function(h) {
-        h.textContent = 'Per ' + guestWord + ' = asked for each ' + guestWord + '. Per registration = asked once.';
-      });
-      document.getElementById('questionsHint').textContent = 'Custom questions on the registration form. Toggle scope to control whether they\'re asked per ' + guestWord + ' or once per registration.';
-      // Left nav label
-      var navItem = document.querySelector('.editor-nav-item[data-tab="form"]');
-      if (navItem) {
-        var svg = navItem.querySelector('svg');
-        navItem.textContent = '';
-        if (svg) navItem.appendChild(svg);
-        navItem.appendChild(document.createTextNode(isPaid ? ' Tickets' : ' Registration'));
-      }
     }
 
     function expandQuestion(card) {
