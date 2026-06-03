@@ -1500,8 +1500,8 @@
             Registration
           </div>
           <div class="editor-nav-item" data-tab="tickets">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 013-3h14a3 3 0 013 3v0a3 3 0 01-3 3v1a3 3 0 013 3v0a3 3 0 01-3 3H5a3 3 0 01-3-3v0a3 3 0 013-3v-1a3 3 0 01-3-3z"/></svg>
-            Admission
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Guest types
           </div>
           <div class="editor-nav-section">Manage</div>
           <div class="editor-nav-item" data-tab="guests">
@@ -2146,7 +2146,7 @@
             <!-- Page header -->
             <div>
               <div class="text-xl font-600">Registration</div>
-              <div class="text-sm text-muted" style="margin-top: 2px;">What guests fill in when they register. Configure admission types and pricing in <a href="#" onclick="event.preventDefault(); switchEditorTab('tickets')" style="color: var(--accent); font-weight: 500;">Admission</a>.</div>
+              <div class="text-sm text-muted" style="margin-top: 2px;">What guests fill in when they register. Configure types and pricing in <a href="#" onclick="event.preventDefault(); switchEditorTab('tickets')" style="color: var(--accent); font-weight: 500;">Guest types</a>.</div>
             </div>
 
             <!-- ═══ PER-GUEST FIELDS ═══ -->
@@ -2316,74 +2316,147 @@
         </div>
       </div>
 
-      <!-- ─── Tickets Tab ─── -->
+      <!-- ─── Guest Types Tab ─── -->
       <div class="tab-content" data-tab="tickets">
         <div style="flex: 1; padding: 24px; overflow-y: auto;">
           <div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
 
             <!-- Page header -->
-            <div class="flex justify-between items-end">
-              <div>
-                <div class="text-xl font-600">Admission</div>
-                <div class="text-sm text-muted" style="margin-top: 2px;">What guests choose when they register. Add a price to charge for admission.</div>
-              </div>
-              <button class="btn btn-sm btn-primary" onclick="addTicketType()">+ Add type</button>
+            <div>
+              <div class="text-xl font-600">Guest types</div>
+              <div class="text-sm text-muted" style="margin-top: 2px;">Manage who can attend and how. Add sub-events for dinners, workshops, or sessions.</div>
             </div>
 
-            <!-- Types table -->
-            <div class="card" style="padding: 0;" id="ticketTypesCard">
-              <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead>
-                  <tr style="border-bottom: 1px solid var(--line); background: var(--bg-subtle);">
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Type</th>
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Price</th>
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Capacity</th>
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Per order</th>
-                    <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Registered</th>
-                    <th style="width: 40px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="ticketTypesBody">
-                  <tr class="ticket-table-row">
-                    <td style="padding: 10px 14px;"><input class="input" value="General Admission" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; color: var(--muted);"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="200" style="border:none; padding:0; background:transparent; width:40px;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="5" style="border:none; padding:0; background:transparent; width:30px;"></td>
-                    <td style="padding: 10px 14px; color: var(--muted);">142</td>
-                    <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
-                  </tr>
-                  <tr class="ticket-table-row">
-                    <td style="padding: 10px 14px;"><input class="input" value="VIP Dinner" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="$100" style="border:none; padding:0; background:transparent; width:55px;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="40" style="border:none; padding:0; background:transparent; width:40px;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="1" style="border:none; padding:0; background:transparent; width:30px;"></td>
-                    <td style="padding: 10px 14px; color: var(--muted);">28</td>
-                    <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
-                  </tr>
-                  <tr class="ticket-table-row">
-                    <td style="padding: 10px 14px;"><input class="input" value="Comp" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; color: var(--muted);"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="20" style="border:none; padding:0; background:transparent; width:40px;"></td>
-                    <td style="padding: 10px 14px;"><input class="input" value="1" style="border:none; padding:0; background:transparent; width:30px;"></td>
-                    <td style="padding: 10px 14px; color: var(--muted);">14</td>
-                    <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
-                  </tr>
-                </tbody>
-              </table>
+            <!-- ═══ MAIN EVENT ═══ -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+              <div style="padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="flex: 1;">
+                  <div class="flex items-center gap-8">
+                    <div class="font-600">Acme Holiday Party 2026</div>
+                    <span style="padding: 2px 8px; background: var(--accent-light); border-radius: 20px; font-size: 11px; font-weight: 500; color: var(--accent);">Main event</span>
+                  </div>
+                  <div class="text-xs text-muted" style="margin-top: 3px;">Free · 200 capacity · up to 5 per registration</div>
+                </div>
+                <div style="text-align: right;">
+                  <div class="font-700" style="font-size: 20px; color: var(--accent);">142</div>
+                  <div class="text-xs text-muted">registered</div>
+                </div>
+              </div>
+              <div style="padding: 0 16px 12px;">
+                <div style="height: 4px; background: var(--border-light); border-radius: 4px;">
+                  <div style="height: 100%; width: 71%; background: var(--accent); border-radius: 4px;"></div>
+                </div>
+                <div class="text-xs text-muted" style="margin-top: 3px;">142 of 200 · 58 spots remaining</div>
+              </div>
+              <div style="padding: 10px 16px; border-top: 1px solid var(--border-light); background: var(--bg-subtle); display: flex; gap: 16px;">
+                <div class="flex items-center justify-between" style="flex: 1;">
+                  <span class="text-xs text-muted">Price</span>
+                  <input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; font-size: 12px; color: var(--muted); text-align: right;">
+                </div>
+                <div style="width: 1px; background: var(--border-light);"></div>
+                <div class="flex items-center justify-between" style="flex: 1;">
+                  <span class="text-xs text-muted">Capacity</span>
+                  <input class="input" value="200" style="border:none; padding:0; background:transparent; width:40px; font-size: 12px; text-align: right;">
+                </div>
+                <div style="width: 1px; background: var(--border-light);"></div>
+                <div class="flex items-center justify-between" style="flex: 1;">
+                  <span class="text-xs text-muted">Per registration</span>
+                  <input class="input" value="5" style="border:none; padding:0; background:transparent; width:25px; font-size: 12px; text-align: right;">
+                </div>
+              </div>
             </div>
 
-            <!-- Capacity -->
-            <div class="card" style="padding: 14px; background: var(--bg-subtle);">
-              <div class="flex justify-between items-center" style="margin-bottom: 8px;">
-                <span class="text-sm font-600">Total capacity</span>
-                <span class="text-sm font-600">260 across all types</span>
+            <!-- ═══ SUB-EVENTS ═══ -->
+            <div>
+              <div class="flex items-center justify-between" style="margin-bottom: 10px;">
+                <div>
+                  <div class="reg-group-label" style="margin-bottom: 0;">Sub-events</div>
+                  <div class="text-xs text-muted">Optional add-ons guests can also register for — dinners, workshops, sessions.</div>
+                </div>
+                <button class="btn btn-sm" onclick="addTicketType()">+ Add</button>
               </div>
-              <div style="height: 5px; background: var(--border-light); border-radius: 4px;">
-                <div style="height: 100%; width: 71%; background: var(--accent); border-radius: 4px;"></div>
+
+              <!-- VIP Dinner -->
+              <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 8px;">
+                <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <div class="font-500">VIP Dinner</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Pre-event dinner at 6 PM · $100 · 40 capacity</div>
+                  </div>
+                  <div class="flex items-center gap-10">
+                    <div style="text-align: right;">
+                      <span class="font-600">28</span>
+                      <span class="text-xs text-muted"> / 40</span>
+                    </div>
+                    <button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button>
+                  </div>
+                </div>
+                <div style="padding: 8px 16px 10px; border-top: 1px solid var(--border-light); background: var(--bg-subtle); display: flex; gap: 16px;">
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Price</span>
+                    <input class="input" value="$100" style="border:none; padding:0; background:transparent; width:55px; font-size: 12px; text-align: right;">
+                  </div>
+                  <div style="width: 1px; background: var(--border-light);"></div>
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Capacity</span>
+                    <input class="input" value="40" style="border:none; padding:0; background:transparent; width:40px; font-size: 12px; text-align: right;">
+                  </div>
+                  <div style="width: 1px; background: var(--border-light);"></div>
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Per registration</span>
+                    <input class="input" value="1" style="border:none; padding:0; background:transparent; width:25px; font-size: 12px; text-align: right;">
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-between" style="margin-top: 4px;">
-                <span class="text-xs text-muted">184 registered</span>
-                <span class="text-xs text-muted">76 remaining</span>
+
+              <!-- After-party -->
+              <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 8px;">
+                <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <div class="font-500">After-party Drinks</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Rooftop bar · Free · 100 capacity</div>
+                  </div>
+                  <div class="flex items-center gap-10">
+                    <div style="text-align: right;">
+                      <span class="font-600">0</span>
+                      <span class="text-xs text-muted"> / 100</span>
+                    </div>
+                    <button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button>
+                  </div>
+                </div>
+                <div style="padding: 8px 16px 10px; border-top: 1px solid var(--border-light); background: var(--bg-subtle); display: flex; gap: 16px;">
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Price</span>
+                    <input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; font-size: 12px; color: var(--muted); text-align: right;">
+                  </div>
+                  <div style="width: 1px; background: var(--border-light);"></div>
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Capacity</span>
+                    <input class="input" value="100" style="border:none; padding:0; background:transparent; width:40px; font-size: 12px; text-align: right;">
+                  </div>
+                  <div style="width: 1px; background: var(--border-light);"></div>
+                  <div class="flex items-center justify-between" style="flex: 1;">
+                    <span class="text-xs text-muted">Per registration</span>
+                    <input class="input" value="2" style="border:none; padding:0; background:transparent; width:25px; font-size: 12px; text-align: right;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comp -->
+              <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 8px;">
+                <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <div class="font-500">Comp</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Staff and speaker passes · Free · 20 capacity</div>
+                  </div>
+                  <div class="flex items-center gap-10">
+                    <div style="text-align: right;">
+                      <span class="font-600">14</span>
+                      <span class="text-xs text-muted"> / 20</span>
+                    </div>
+                    <button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2394,14 +2467,14 @@
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;"><rect width="16" height="16" rx="3" fill="#635bff"/><path d="M7.5 6.2c0-.4.3-.6.8-.6.7 0 1.5.2 2.2.6l.3-2A5.8 5.8 0 008.2 3.6C6.3 3.6 5 4.6 5 6.2c0 3 4 2.5 4 3.8 0 .5-.4.7-.9.7-.8 0-1.8-.3-2.6-.8l-.4 2c.7.4 1.9.6 2.9.6 2 0 3.3-1 3.3-2.6C11.3 7 7.5 7.5 7.5 6.2z" fill="#fff"/></svg>
                   <div>
                     <div class="text-sm font-500">Stripe connected</div>
-                    <div class="text-xs text-muted">Required for paid types · Acme Co.</div>
+                    <div class="text-xs text-muted">Required for paid sub-events · Acme Co.</div>
                   </div>
                 </div>
                 <button class="btn btn-sm btn-ghost">Manage</button>
               </div>
             </div>
 
-            <!-- Settings -->
+            <!-- Waitlist -->
             <div class="card" style="padding: 0;">
               <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
                 <div>
