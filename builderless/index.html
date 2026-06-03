@@ -2148,33 +2148,19 @@
               <button class="btn btn-sm btn-primary" onclick="addTicketType()">+ Add registration type</button>
             </div>
 
-            <!-- Registration status -->
-            <div class="card" style="padding: 0;">
-              <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                  <div class="text-sm font-500">Registration</div>
-                  <div class="text-xs text-muted" style="margin-top: 1px;">Allow new guests to register</div>
-                </div>
-                <div class="q-chips" style="gap: 4px;">
-                  <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 10px; font-size: 11px;">Open</div>
-                  <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 10px; font-size: 11px;">Closed</div>
-                </div>
-              </div>
-            </div>
-
             <!-- ═══ REGISTRATION TYPES ═══ -->
             <div>
               <div class="reg-group-label">Registration types</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">Leave price blank for a free RSVP. Add a price to sell it as a ticket.</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">Each type is what guests select when they register. Leave price blank for a free RSVP — add a price to sell it as a ticket.</div>
               <div class="card" style="padding: 0;" id="ticketTypesCard">
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                   <thead>
                     <tr style="border-bottom: 1px solid var(--line); background: var(--bg-subtle);">
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Type</th>
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Price</th>
-                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Limit</th>
+                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Capacity</th>
+                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Per order</th>
                       <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Registered</th>
-                      <th style="text-align: left; padding: 10px 14px; font-weight: 500; color: var(--muted); font-size: 12px;">Status</th>
                       <th style="width: 40px;"></th>
                     </tr>
                   </thead>
@@ -2182,80 +2168,47 @@
                     <tr class="ticket-table-row">
                       <td style="padding: 10px 14px;">
                         <input class="input" value="General Admission" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Default for all attendees</div>
                       </td>
-                      <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:60px; color: var(--muted);"></td>
-                      <td style="padding: 10px 14px;"><input class="input" value="200" style="border:none; padding:0; background:transparent; width:50px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; color: var(--muted);"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="200" style="border:none; padding:0; background:transparent; width:40px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="5" style="border:none; padding:0; background:transparent; width:30px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">142</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                     <tr class="ticket-table-row">
                       <td style="padding: 10px 14px;">
                         <input class="input" value="VIP Dinner" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Includes pre-event dinner at 6 PM</div>
                       </td>
-                      <td style="padding: 10px 14px;"><input class="input" value="$100" style="border:none; padding:0; background:transparent; width:60px;"></td>
-                      <td style="padding: 10px 14px;"><input class="input" value="40" style="border:none; padding:0; background:transparent; width:50px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="$100" style="border:none; padding:0; background:transparent; width:55px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="40" style="border:none; padding:0; background:transparent; width:40px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="1" style="border:none; padding:0; background:transparent; width:30px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">28</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                     <tr class="ticket-table-row">
                       <td style="padding: 10px 14px;">
                         <input class="input" value="Comp" style="border:none; padding:0; background:transparent; font-weight:500; width:100%;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Staff and speaker passes</div>
                       </td>
-                      <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:60px; color: var(--muted);"></td>
-                      <td style="padding: 10px 14px;"><input class="input" value="20" style="border:none; padding:0; background:transparent; width:50px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:55px; color: var(--muted);"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="20" style="border:none; padding:0; background:transparent; width:40px;"></td>
+                      <td style="padding: 10px 14px;"><input class="input" value="1" style="border:none; padding:0; background:transparent; width:30px;"></td>
                       <td style="padding: 10px 14px; color: var(--muted);">14</td>
-                      <td style="padding: 10px 14px;"><span class="tag tag-active">Open</span></td>
                       <td style="padding: 10px 14px; text-align: center;"><button class="btn-icon" onclick="removeTicketRow(this)" title="Remove">×</button></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <!-- Stripe — shows because VIP Dinner has a price -->
-              <div class="card" style="padding: 12px 16px; margin-top: 8px;">
+              <div class="card" style="padding: 10px 16px; margin-top: 8px;">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-8">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;"><rect width="16" height="16" rx="3" fill="#635bff"/><path d="M7.5 6.2c0-.4.3-.6.8-.6.7 0 1.5.2 2.2.6l.3-2A5.8 5.8 0 008.2 3.6C6.3 3.6 5 4.6 5 6.2c0 3 4 2.5 4 3.8 0 .5-.4.7-.9.7-.8 0-1.8-.3-2.6-.8l-.4 2c.7.4 1.9.6 2.9.6 2 0 3.3-1 3.3-2.6C11.3 7 7.5 7.5 7.5 6.2z" fill="#fff"/></svg>
                     <div>
                       <div class="text-sm font-500">Stripe connected</div>
-                      <div class="text-xs text-muted">Required for paid types · Acme Co. · acct_1A2b...</div>
+                      <div class="text-xs text-muted">Acme Co. · acct_1A2b...</div>
                     </div>
                   </div>
                   <button class="btn btn-sm btn-ghost">Manage</button>
-                </div>
-              </div>
-              <!-- Capacity summary -->
-              <div class="card" style="padding: 14px; background: var(--bg-subtle); margin-top: 8px;">
-                <div class="flex justify-between items-center" style="margin-bottom: 8px;">
-                  <span class="text-sm font-600">Capacity</span>
-                  <span class="text-sm font-600">260 total across all types</span>
-                </div>
-                <div style="height: 5px; background: var(--border-light); border-radius: 4px;">
-                  <div style="height: 100%; width: 71%; background: var(--accent); border-radius: 4px;"></div>
-                </div>
-                <div class="flex justify-between" style="margin-top: 4px;">
-                  <span class="text-xs text-muted">184 registered</span>
-                  <span class="text-xs text-muted">76 remaining</span>
-                </div>
-              </div>
-              <!-- Max per registration -->
-              <div class="card" style="padding: 14px; margin-top: 8px;">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="text-sm font-600">Max per registration</div>
-                    <div class="text-sm text-muted">How many guests one person can register at once</div>
-                  </div>
-                  <div class="q-chips" style="gap: 4px;">
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">1</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">2</div>
-                    <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">5</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">10</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">∞</div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -2403,14 +2356,23 @@
               <button class="btn btn-sm" style="margin-top: 10px;">+ Add question</button>
             </div>
 
-            <!-- Waitlist -->
-            <div class="card" style="padding: 14px;">
-              <div class="toggle-row">
-                <div>
-                  <div class="toggle-label">Waitlist when full</div>
-                  <div class="toggle-hint">Capture interest after capacity is reached</div>
+            <!-- Bottom settings — less prominent -->
+            <div style="border-top: 1px solid var(--border-light); padding-top: 20px; margin-top: 4px;">
+              <div class="card" style="padding: 0;">
+                <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
+                  <div>
+                    <div class="text-sm font-500">Waitlist when full</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Capture interest after capacity is reached</div>
+                  </div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
                 </div>
-                <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <div class="text-sm font-500">Close registration</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Stop accepting new registrations</div>
+                  </div>
+                  <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                </div>
               </div>
             </div>
 
