@@ -662,6 +662,11 @@
       background: var(--accent-light);
       color: var(--accent);
     }
+    .q-badge-default {
+      background: var(--bg-subtle);
+      color: var(--muted);
+      border: 1px dashed var(--border-light);
+    }
     .q-card-body {
       border-top: 1px solid var(--line);
       padding: 16px;
@@ -2183,33 +2188,45 @@
               </div>
             </div>
 
-            <!-- ═══ REGISTRATION FORM (single registrant by default) ═══ -->
+            <!-- ═══ REGISTRATION FORM — built-in fields, same row style as questions ═══ -->
             <div>
               <div class="reg-group-label">Registration form</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 8px;">What each person fills in when they register.</div>
-              <div class="reg-field-row">
-                <div class="reg-field">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
-                  <span class="reg-field-name">Name</span>
-                  <div class="q-chips" style="gap: 4px; margin-left: auto;">
-                    <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Full Name</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">First + Last</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">What each person fills in when they register.</div>
+              <div class="flex flex-col" style="gap: 8px;">
+
+                <div class="q-card" onclick="expandQuestion(this)">
+                  <div class="q-card-header">
+                    <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
+                    <span class="q-card-title">Name</span>
+                    <span class="q-badge q-badge-default">Built-in</span>
+                    <span class="q-badge q-badge-type">Full name</span>
+                    <span class="q-badge q-badge-optional">Required</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
-                <div class="reg-field">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
-                  <span class="reg-field-name">Email</span>
-                  <span class="text-xs text-muted" style="margin-left: auto;">Required</span>
-                </div>
-                <div class="reg-field">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                  <span class="reg-field-name">Phone</span>
-                  <div class="q-chips" style="gap: 4px; margin-left: auto;">
-                    <div class="q-chip active" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Off</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Optional</div>
-                    <div class="q-chip" onclick="selectChip(this)" style="padding: 3px 8px; font-size: 11px;">Required</div>
+
+                <div class="q-card" onclick="expandQuestion(this)">
+                  <div class="q-card-header">
+                    <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                    <span class="q-card-title">Email</span>
+                    <span class="q-badge q-badge-default">Built-in</span>
+                    <span class="q-badge q-badge-type">Email</span>
+                    <span class="q-badge q-badge-optional">Required</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
+
+                <div class="q-card" onclick="expandQuestion(this)">
+                  <div class="q-card-header">
+                    <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    <span class="q-card-title">Phone</span>
+                    <span class="q-badge q-badge-default">Built-in</span>
+                    <span class="q-badge q-badge-type">Phone</span>
+                    <span class="q-badge q-badge-optional">Off</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -2217,7 +2234,7 @@
             <div>
               <div class="reg-group-label">Questions</div>
               <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">Custom questions, asked once when someone registers.</div>
-              <div class="flex flex-col" style="gap: 8px;">
+              <div class="flex flex-col" style="gap: 8px;" id="questionsList">
 
                 <div class="q-card" onclick="expandQuestion(this)">
                   <div class="q-card-header">
@@ -2240,7 +2257,7 @@
                 </div>
 
               </div>
-              <button class="btn btn-sm" style="margin-top: 10px;">+ Add question</button>
+              <button class="btn btn-sm" style="margin-top: 10px;" onclick="addQuestion()">+ Add question</button>
             </div>
 
             <!-- ═══ ADDITIONAL GUESTS (own section, disabled by default) ═══ -->
@@ -3877,23 +3894,76 @@
     }
 
 
+    function collapseQuestion(card) {
+      card.classList.remove('expanded');
+      var body = card.querySelector('.q-card-body');
+      if (body) body.remove();
+      var chev = card.querySelector('.q-card-header svg:last-child');
+      if (chev) chev.style.transform = '';
+      // un-hide the header badges
+      card.querySelectorAll('.q-card-header .q-badge').forEach(function(b){ b.style.display = ''; });
+    }
+
+    function buildQuestionBody(card) {
+      var title = (card.querySelector('.q-card-title') || {}).textContent || '';
+      var typeBadge = card.querySelector('.q-badge-type');
+      var type = typeBadge ? typeBadge.textContent : 'Short text';
+      var reqBadge = card.querySelector('.q-badge-optional');
+      var required = reqBadge ? reqBadge.textContent : 'Optional';
+      var isBuiltIn = !!card.querySelector('.q-badge-default');
+      var typeOpts = ['Short text', 'Dropdown', 'Checkbox', 'Number'];
+
+      var body = document.createElement('div');
+      body.className = 'q-card-body';
+      body.setAttribute('onclick', 'event.stopPropagation();');
+      var typeChips = typeOpts.map(function(t){
+        return '<div class="q-chip' + (t === type ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">' + t + '</div>';
+      }).join('');
+      var reqA = required === 'Required';
+      body.innerHTML =
+        '<div><div class="q-row-label">Question</div>' +
+          '<input class="input" value="' + title.replace(/"/g,'&quot;') + '" oninput="event.stopPropagation();" onclick="event.stopPropagation();" style="font-size: 13px;"></div>' +
+        '<div><div class="q-row-label">Answer type</div><div class="q-chips">' + typeChips + '</div></div>' +
+        '<div><div class="q-row-label">Required</div><div class="q-chips">' +
+          '<div class="q-chip' + (reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Required</div>' +
+          '<div class="q-chip' + (!reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Optional</div>' +
+        '</div></div>' +
+        (isBuiltIn
+          ? '<div class="text-xs text-muted">Built-in field — included on every registration form.</div>'
+          : '<div style="display:flex; justify-content:flex-end;"><button class="btn btn-sm" style="color: #dc2626;" onclick="event.stopPropagation(); this.closest(\'.q-card\').remove();">Delete question</button></div>');
+      return body;
+    }
+
     function expandQuestion(card) {
-      // Just a visual demo — toggle expanded state
-      if (card.classList.contains('expanded')) return;
-      // collapse all others
-      document.querySelectorAll('.q-card.expanded').forEach(function(c) {
-        c.classList.remove('expanded');
-        // remove the body if dynamically added
-        var body = c.querySelector('.q-card-body');
-        if (body) body.remove();
-        // flip chevron back
-        var chev = c.querySelector('.q-card-header svg:last-child');
-        if (chev) chev.style.transform = '';
-        // re-add badges that were hidden
-      });
+      // clicking the header of an open card collapses it
+      if (card.classList.contains('expanded')) { collapseQuestion(card); return; }
+      // collapse any other open card
+      document.querySelectorAll('.q-card.expanded').forEach(collapseQuestion);
+      // hide the header badges while editing for a clean look
+      card.querySelectorAll('.q-card-header .q-badge').forEach(function(b){ b.style.display = 'none'; });
       card.classList.add('expanded');
+      card.appendChild(buildQuestionBody(card));
       var chev = card.querySelector('.q-card-header svg:last-child');
       if (chev) chev.style.transform = 'rotate(180deg)';
+    }
+
+    function addQuestion() {
+      var list = document.getElementById('questionsList');
+      var card = document.createElement('div');
+      card.className = 'q-card';
+      card.setAttribute('onclick', 'expandQuestion(this)');
+      card.innerHTML =
+        '<div class="q-card-header">' +
+          '<svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>' +
+          '<span class="q-card-title">New question</span>' +
+          '<span class="q-badge q-badge-type">Short text</span>' +
+          '<span class="q-badge q-badge-optional">Optional</span>' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</div>';
+      list.appendChild(card);
+      expandQuestion(card);
+      var input = card.querySelector('.q-card-body input');
+      if (input) { input.value = ''; input.focus(); }
     }
 
     function toggleAutomation(card) {
