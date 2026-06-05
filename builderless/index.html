@@ -2145,26 +2145,24 @@
               <div class="text-sm text-muted" style="margin-top: 2px;">How guests sign up for your event. Add a price to any registration type to sell tickets.</div>
             </div>
 
-            <!-- ═══ REGISTRATION TYPES — Partiful model ═══ -->
+            <!-- ═══ REGISTRATION TYPES — Partiful model (starts free) ═══ -->
             <div>
               <div class="flex items-center justify-between" style="margin-bottom: 8px;">
                 <div class="reg-group-label" style="margin-bottom: 0;">Registration types</div>
-                <button class="btn btn-sm" onclick="addTicketType()">+ Add type</button>
+                <button class="btn btn-sm" onclick="addRegType()">+ Add type</button>
               </div>
               <div class="text-xs text-muted" style="margin-bottom: 10px;">Guests choose one when they register. Add a price to turn it into a paid ticket.</div>
-              <div class="flex flex-col" style="gap: 8px;">
+              <div class="flex flex-col" style="gap: 8px;" id="regTypesList">
 
                 <!-- Type 1: General — free, default -->
-                <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="card reg-type-card" style="padding: 0; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;">
                   <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
                     <div style="flex: 1;">
-                      <div class="flex items-center gap-6">
-                        <input class="input" value="General" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;">
-                      </div>
+                      <input class="input reg-type-name" value="General" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;">
                     </div>
                     <div class="flex items-center gap-12" style="flex-shrink: 0;">
                       <div style="text-align: center;">
-                        <input class="input" value="" placeholder="Free" style="border:none; padding:0; background:transparent; width:50px; font-size: 13px; color: var(--muted); text-align: center;">
+                        <input class="input reg-type-price" value="" placeholder="Free" oninput="onPriceInput()" style="border:none; padding:0; background:transparent; width:55px; font-size: 13px; color: var(--muted); text-align: center;">
                         <div class="text-xs text-muted" style="margin-top: 1px;">Price</div>
                       </div>
                       <div style="text-align: center;">
@@ -2183,44 +2181,16 @@
                   </div>
                 </div>
 
-                <!-- Type 2: VIP — paid ticket -->
-                <div class="card" style="padding: 0; overflow: hidden; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-light);">
-                  <div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
-                    <div style="flex: 1;">
-                      <div class="flex items-center gap-6">
-                        <input class="input" value="VIP" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;">
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-12" style="flex-shrink: 0;">
-                      <div style="text-align: center;">
-                        <input class="input" value="$150" style="border:none; padding:0; background:transparent; width:50px; font-size: 13px; text-align: center; color: var(--accent); font-weight: 600;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Price</div>
-                      </div>
-                      <div style="text-align: center;">
-                        <input class="input" value="40" style="border:none; padding:0; background:transparent; width:35px; font-size: 13px; text-align: center;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Capacity</div>
-                      </div>
-                      <div style="text-align: center;">
-                        <input class="input" value="1" style="border:none; padding:0; background:transparent; width:25px; font-size: 13px; text-align: center;">
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Per reg</div>
-                      </div>
-                      <div style="text-align: center; min-width: 30px;">
-                        <div class="font-600" style="color: var(--accent);">28</div>
-                        <div class="text-xs text-muted" style="margin-top: 1px;">Guests</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              <!-- Stripe — appears because VIP has a price -->
-              <div class="card" style="padding: 10px 16px; margin-top: 10px; background: var(--bg-subtle);">
+              <!-- Stripe — only appears when a type has a price -->
+              <div class="card" id="stripeBanner" style="display: none; padding: 10px 16px; margin-top: 10px; background: var(--bg-subtle);">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-8">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;"><rect width="16" height="16" rx="3" fill="#635bff"/><path d="M7.5 6.2c0-.4.3-.6.8-.6.7 0 1.5.2 2.2.6l.3-2A5.8 5.8 0 008.2 3.6C6.3 3.6 5 4.6 5 6.2c0 3 4 2.5 4 3.8 0 .5-.4.7-.9.7-.8 0-1.8-.3-2.6-.8l-.4 2c.7.4 1.9.6 2.9.6 2 0 3.3-1 3.3-2.6C11.3 7 7.5 7.5 7.5 6.2z" fill="#fff"/></svg>
-                    <span class="text-sm">Stripe connected · Acme Co.</span>
+                    <span class="text-sm" id="stripeBannerText">Connect Stripe to collect payments</span>
                   </div>
-                  <button class="btn btn-sm btn-ghost" style="font-size: 11px;">Manage</button>
+                  <button class="btn btn-sm btn-primary" style="font-size: 11px;" id="stripeBannerBtn">Connect Stripe</button>
                 </div>
               </div>
             </div>
@@ -3630,6 +3600,51 @@
       var siblings = chip.parentElement.querySelectorAll('.q-chip');
       siblings.forEach(function(s) { s.classList.remove('active'); });
       chip.classList.add('active');
+    }
+
+    // ═══ REGISTRATION TYPES — free ↔ paid reactivity ═══
+    function onPriceInput() {
+      var anyPaid = false;
+      document.querySelectorAll('.reg-type-card').forEach(function(card) {
+        var priceInput = card.querySelector('.reg-type-price');
+        var raw = (priceInput.value || '').replace(/[^0-9.]/g, '');
+        var isPaid = raw !== '' && parseFloat(raw) > 0;
+        if (isPaid) {
+          anyPaid = true;
+          // accent border + accent price text
+          card.style.borderColor = 'var(--accent)';
+          card.style.boxShadow = '0 0 0 1px var(--accent-light)';
+          priceInput.style.color = 'var(--accent)';
+          priceInput.style.fontWeight = '600';
+        } else {
+          card.style.borderColor = '';
+          card.style.boxShadow = '';
+          priceInput.style.color = 'var(--muted)';
+          priceInput.style.fontWeight = '';
+        }
+      });
+      // Show Stripe banner only when at least one type is paid
+      document.getElementById('stripeBanner').style.display = anyPaid ? 'block' : 'none';
+    }
+
+    function addRegType() {
+      var list = document.getElementById('regTypesList');
+      var card = document.createElement('div');
+      card.className = 'card reg-type-card';
+      card.style.cssText = 'padding: 0; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;';
+      card.innerHTML =
+        '<div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">' +
+          '<div style="flex: 1;"><input class="input reg-type-name" value="" placeholder="New type" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;"></div>' +
+          '<div class="flex items-center gap-12" style="flex-shrink: 0;">' +
+            '<div style="text-align: center;"><input class="input reg-type-price" value="" placeholder="Free" oninput="onPriceInput()" style="border:none; padding:0; background:transparent; width:55px; font-size: 13px; color: var(--muted); text-align: center;"><div class="text-xs text-muted" style="margin-top: 1px;">Price</div></div>' +
+            '<div style="text-align: center;"><input class="input" value="100" style="border:none; padding:0; background:transparent; width:35px; font-size: 13px; text-align: center;"><div class="text-xs text-muted" style="margin-top: 1px;">Capacity</div></div>' +
+            '<div style="text-align: center;"><input class="input" value="1" style="border:none; padding:0; background:transparent; width:25px; font-size: 13px; text-align: center;"><div class="text-xs text-muted" style="margin-top: 1px;">Per reg</div></div>' +
+            '<div style="text-align: center; min-width: 30px;"><div class="font-600" style="color: var(--accent);">0</div><div class="text-xs text-muted" style="margin-top: 1px;">Guests</div></div>' +
+            '<button class="btn-icon" onclick="this.closest(\'.reg-type-card\').remove(); onPriceInput();" title="Remove" style="font-size: 16px;">×</button>' +
+          '</div>' +
+        '</div>';
+      list.appendChild(card);
+      card.querySelector('.reg-type-name').focus();
     }
 
 
