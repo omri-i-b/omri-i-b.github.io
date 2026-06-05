@@ -667,6 +667,10 @@
       color: var(--muted);
       border: 1px dashed var(--border-light);
     }
+    .q-badge-scope { background: var(--accent-light); color: var(--accent); }
+    /* Per-guest scope only surfaces once plus ones are allowed */
+    #regFormBody:not(.allow-guests) .q-badge-scope { display: none; }
+    #regFormBody:not(.allow-guests) .q-scope-row { display: none; }
     .q-card-body {
       border-top: 1px solid var(--line);
       padding: 16px;
@@ -2265,29 +2269,41 @@
               <button class="btn btn-sm" style="margin-top: 10px;" onclick="addQuestion()">+ Add question</button>
             </div>
 
-            <!-- ═══ PLUS ONES (Partiful-style) ═══ -->
-            <div>
-              <div class="reg-group-label">Plus ones</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 10px;">Let one person bring others on the same registration.</div>
-              <div class="card" style="padding: 0; overflow: hidden;">
+            <!-- ═══ PLUS ONES — progressive: allow → collect info → questions one by one ═══ -->
+            <div class="card" id="addlGuestsCard" style="padding: 0; overflow: hidden;">
+              <!-- Step 1: allow at all -->
+              <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div class="text-sm font-500">Plus ones</div>
+                  <div class="text-xs text-muted" style="margin-top: 1px;">Let one person bring others on the same registration</div>
+                </div>
+                <div class="toggle" id="allowGuestsToggle" onclick="toggleAllowGuests()"><div class="toggle-knob"></div></div>
+              </div>
+              <!-- Steps 2+: only after allowing -->
+              <div id="addlGuestsBody" style="display: none; border-top: 1px solid var(--line);">
                 <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
-                  <div class="text-sm font-500">Allowed per registration</div>
-                  <select class="input" id="plusOnesMax" onchange="onPlusOnesChange()" style="width: auto; font-size: 13px; padding: 5px 28px 5px 10px; cursor: pointer;">
-                    <option value="0">None</option>
-                    <option value="1">Up to 1</option>
-                    <option value="2">Up to 2</option>
-                    <option value="3">Up to 3</option>
-                    <option value="5" selected>Up to 5</option>
-                    <option value="-1">Unlimited</option>
+                  <div class="text-sm">Allowed per registration</div>
+                  <select class="input" style="width: auto; font-size: 13px; padding: 5px 28px 5px 10px; cursor: pointer;">
+                    <option>Up to 1</option>
+                    <option>Up to 2</option>
+                    <option>Up to 3</option>
+                    <option selected>Up to 5</option>
+                    <option>Unlimited</option>
                   </select>
                 </div>
-                <label id="requireNamesRow" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                <!-- Step 2: agree to collect their personal info -->
+                <label style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid var(--line);">
                   <div>
-                    <div class="text-sm font-500">Require names</div>
-                    <div class="text-xs text-muted" style="margin-top: 1px;">Ask for each plus one's name. Off just counts heads.</div>
+                    <div class="text-sm font-500">Collect each guest's name</div>
+                    <div class="text-xs text-muted" style="margin-top: 1px;">Off just counts heads — no personal details per guest</div>
                   </div>
                   <div class="toggle on" onclick="event.preventDefault(); this.classList.toggle('on')"><div class="toggle-knob"></div></div>
                 </label>
+                <!-- Step 3 pointer -->
+                <div style="padding: 11px 16px; display: flex; align-items: flex-start; gap: 8px; background: var(--bg-subtle);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span class="text-xs" style="color: var(--ink);">Choose which questions each guest answers one by one — open a question above and turn on <strong>Ask each guest</strong>.</span>
+                </div>
               </div>
             </div>
 
@@ -3737,11 +3753,34 @@
       chip.classList.add('active');
     }
 
-    // ═══ PLUS ONES (Partiful-style) ═══
-    function onPlusOnesChange() {
-      var val = document.getElementById('plusOnesMax').value;
-      // "None" → no plus ones, so hide the Require names row
-      document.getElementById('requireNamesRow').style.display = val === '0' ? 'none' : 'flex';
+    // ═══ PLUS ONES — gate that unlocks per-guest options ═══
+    function toggleAllowGuests() {
+      var toggle = document.getElementById('allowGuestsToggle');
+      toggle.classList.toggle('on');
+      var on = toggle.classList.contains('on');
+      document.getElementById('addlGuestsBody').style.display = on ? 'block' : 'none';
+      // step 3: per-question "Ask each guest" only matters once guests are allowed
+      document.getElementById('regFormBody').classList.toggle('allow-guests', on);
+    }
+
+    // Per-question: ask each guest or just the registrant
+    function setQuestionScope(chip, scope) {
+      selectChip(chip);
+      var card = chip.closest('.q-card');
+      card.setAttribute('data-scope', scope);
+      var header = card.querySelector('.q-card-header');
+      var badge = header.querySelector('.q-badge-scope');
+      if (scope === 'each') {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'q-badge q-badge-scope';
+          badge.textContent = 'Each guest';
+          badge.style.display = 'none'; // header badges stay hidden while expanded
+          header.insertBefore(badge, header.querySelector('.q-card-title').nextSibling);
+        }
+      } else if (badge) {
+        badge.remove();
+      }
     }
 
     // ═══ EVENT CAPACITY (finite or infinite) ═══
@@ -3896,6 +3935,14 @@
         return '<div class="q-chip' + (t === type ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">' + t + '</div>';
       }).join('');
       var reqA = required === 'Required';
+      var scope = card.getAttribute('data-scope') || 'registrant';
+      var eachActive = scope === 'each';
+      // Step 3 — only relevant when plus ones are allowed (gated by CSS .q-scope-row)
+      var scopeRow =
+        '<div class="q-scope-row"><div class="q-row-label">Ask each guest?</div><div class="q-chips">' +
+          '<div class="q-chip' + (!eachActive ? ' active' : '') + '" onclick="setQuestionScope(this, \'registrant\'); event.stopPropagation();">Just the registrant</div>' +
+          '<div class="q-chip' + (eachActive ? ' active' : '') + '" onclick="setQuestionScope(this, \'each\'); event.stopPropagation();">Each guest too</div>' +
+        '</div></div>';
       body.innerHTML =
         '<div><div class="q-row-label">Question</div>' +
           '<input class="input" value="' + title.replace(/"/g,'&quot;') + '" oninput="event.stopPropagation();" onclick="event.stopPropagation();" style="font-size: 13px;"></div>' +
@@ -3904,6 +3951,7 @@
           '<div class="q-chip' + (reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Required</div>' +
           '<div class="q-chip' + (!reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Optional</div>' +
         '</div></div>' +
+        scopeRow +
         '<div style="display:flex; justify-content:flex-end;"><button class="btn btn-sm" style="color: #dc2626;" onclick="event.stopPropagation(); this.closest(\'.q-card\').remove();">Delete question</button></div>';
       return body;
     }
