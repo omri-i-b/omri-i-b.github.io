@@ -3303,12 +3303,21 @@
           <div class="flex items-center justify-between">
             <div>
               <div class="text-sm font-500">Capacity</div>
-              <div class="text-xs text-muted" id="rtCapHelper">Leave blank for unlimited · 86 of 200 event capacity left</div>
+              <div class="text-xs text-muted" id="rtCapHelper">Leave blank to use whatever's left of the event capacity</div>
             </div>
-            <input class="input" id="rtCap" placeholder="∞" oninput="rtValidateCap()" style="width: 80px; text-align: center; font-size: 13px;">
+            <div class="flex items-center gap-6">
+              <input class="input" id="rtCap" placeholder="∞" oninput="rtValidateCap()" style="width: 64px; text-align: center; font-size: 13px;">
+              <span class="text-xs text-muted" id="rtCapMax" style="white-space: nowrap;">/ 200 max</span>
+            </div>
+          </div>
+          <div id="rtCapMeter" style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; height: 5px; background: var(--border-light); border-radius: 4px; overflow: hidden;">
+              <div id="rtCapMeterFill" style="height: 100%; width: 57%; background: var(--accent); border-radius: 4px;"></div>
+            </div>
+            <span class="text-xs text-muted" id="rtCapMeterLabel" style="white-space: nowrap;">86 of 200 left</span>
           </div>
           <div id="rtCapWarning" style="display: none; margin-top: 8px; padding: 8px 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 12px; color: #dc2626;">
-            ⚠ Capacity can't exceed the 200 event capacity. We've capped it at the remaining 86 spots.
+            ⚠ A type can't hold more than the event's 200 capacity. Capped at the 86 spots still free.
           </div>
         </div>
 
@@ -3880,18 +3889,53 @@
       var warning = document.getElementById('rtCapWarning');
       var remaining = rtRemainingCap();
       var raw = (input.value || '').replace(/[^0-9]/g, '');
-      if (raw === '') { warning.style.display = 'none'; return; }
       // Unlimited event capacity → no ceiling, anything goes
-      if (remaining === null) { warning.style.display = 'none'; return; }
-      var val = parseInt(raw, 10);
-      if (val > remaining) {
-        // Cap it — this is the thing Luma fails
-        input.value = remaining;
-        warning.textContent = '⚠ Capacity can\'t exceed the ' + EVENT_CAPACITY + ' event capacity. Capped at the remaining ' + remaining + ' spots.';
-        warning.style.display = 'block';
+      if (remaining !== null && raw !== '') {
+        var val = parseInt(raw, 10);
+        if (val > remaining) {
+          // Cap it — the thing Luma fails
+          input.value = remaining;
+          warning.textContent = '⚠ A type can\'t hold more than the event\'s ' + EVENT_CAPACITY + ' capacity. Capped at the ' + remaining + ' spots still free.';
+          warning.style.display = 'block';
+        } else {
+          warning.style.display = 'none';
+        }
       } else {
         warning.style.display = 'none';
       }
+      rtSyncCapUI();
+    }
+
+    // Keep the "/ N max", the meter, and the helper consistent
+    function rtSyncCapUI() {
+      var input = document.getElementById('rtCap');
+      var remaining = rtRemainingCap();           // null = event unlimited
+      var maxLabel = document.getElementById('rtCapMax');
+      var helper = document.getElementById('rtCapHelper');
+      var meter = document.getElementById('rtCapMeter');
+      var meterFill = document.getElementById('rtCapMeterFill');
+      var meterLabel = document.getElementById('rtCapMeterLabel');
+
+      if (remaining === null) {
+        // Event capacity is unlimited → no ceiling to show
+        maxLabel.style.display = 'none';
+        meter.style.display = 'none';
+        helper.textContent = 'Leave blank for unlimited · event capacity is unlimited';
+        return;
+      }
+      maxLabel.style.display = '';
+      meter.style.display = 'flex';
+      maxLabel.textContent = '/ ' + EVENT_CAPACITY + ' max';
+      helper.textContent = 'Can\'t exceed the event capacity (' + EVENT_CAPACITY + ')';
+
+      var raw = (input.value || '').replace(/[^0-9]/g, '');
+      var thisType = raw === '' ? remaining : Math.min(parseInt(raw, 10), remaining); // blank uses the remainder
+      var used = EVENT_CAPACITY - remaining;       // claimed by other types
+      var pct = Math.round(((used + thisType) / EVENT_CAPACITY) * 100);
+      meterFill.style.width = pct + '%';
+      meterLabel.textContent = raw === ''
+        ? remaining + ' of ' + EVENT_CAPACITY + ' free'
+        : remaining + ' of ' + EVENT_CAPACITY + ' left for other types';
     }
 
     function openRegTypeModal(row) {
@@ -3913,12 +3957,9 @@
       // chip states
       document.getElementById('rtChipFree').classList.toggle('active', !paid);
       document.getElementById('rtChipPaid').classList.toggle('active', paid);
-      // capacity helper
-      var remaining = rtRemainingCap();
-      document.getElementById('rtCapHelper').textContent = remaining === null
-        ? 'Leave blank for unlimited · event capacity is unlimited'
-        : 'Leave blank for unlimited · ' + remaining + ' of ' + EVENT_CAPACITY + ' event capacity left';
+      // capacity helper / meter / max suffix
       document.getElementById('rtCapWarning').style.display = 'none';
+      rtSyncCapUI();
       // reset description
       document.getElementById('rtDescWrap').style.display = 'none';
       document.getElementById('rtAddDescBtn').style.display = 'flex';
