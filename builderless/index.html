@@ -2142,31 +2142,62 @@
             <!-- Page header -->
             <div>
               <div class="text-xl font-600">Registration</div>
-              <div class="text-sm text-muted" style="margin-top: 2px;">How guests sign up for your event. Add a price to any registration type to sell tickets.</div>
+              <div class="text-sm text-muted" style="margin-top: 2px;">How guests sign up for your event. Add a price to any type to sell tickets.</div>
             </div>
 
-            <!-- ═══ REGISTRATION TYPES — Partiful model (starts free) ═══ -->
+            <!-- ═══ STATUS PILLS (Luma-style) ═══ -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #ecfdf5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                </div>
+                <div style="min-width: 0;">
+                  <div class="text-sm font-600">Registration</div>
+                  <div class="text-xs" style="color: #10b981;">Open</div>
+                </div>
+              </div>
+              <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff7ed; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                </div>
+                <div style="min-width: 0;">
+                  <div class="text-sm font-600">Capacity</div>
+                  <div class="text-xs text-muted"><span id="pillEventCap">200</span> · Waitlist on</div>
+                </div>
+              </div>
+              <div class="card" style="padding: 12px 14px; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>
+                </div>
+                <div style="min-width: 0;">
+                  <div class="text-sm font-600">Group reg.</div>
+                  <div class="text-xs text-muted">Up to 5</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══ REGISTRATION TYPES ═══ -->
             <div>
               <div class="flex items-center justify-between" style="margin-bottom: 8px;">
                 <div class="reg-group-label" style="margin-bottom: 0;">Registration types</div>
-                <button class="btn btn-sm" onclick="addRegType()">+ Add type</button>
+                <button class="btn btn-sm" onclick="openRegTypeModal()">+ New type</button>
               </div>
-              <div class="text-xs text-muted" style="margin-bottom: 10px;">Guests choose one when they register. Add a price to turn it into a paid ticket.</div>
-              <div class="flex flex-col" style="gap: 8px;" id="regTypesList">
+              <div class="text-xs text-muted" style="margin-bottom: 10px;">Guests choose one when they register. Click a type to edit pricing, capacity & sales window.</div>
+              <div class="card" style="padding: 0; overflow: hidden;" id="regTypesList">
 
-                <!-- Type 1: General — free, default. Simple: just name, price, count. -->
-                <div class="card reg-type-card" style="padding: 0; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;">
-                  <div style="padding: 14px 16px; display: flex; align-items: center; gap: 12px;">
-                    <div style="flex: 1;">
-                      <input class="input reg-type-name" value="General" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;">
-                      <div class="text-xs text-muted" style="margin-top: 1px;"><span class="reg-type-count">114</span> registered</div>
-                    </div>
-                    <div class="flex items-center gap-3" style="flex-shrink: 0; border: 1px solid var(--border-light); border-radius: 8px; padding: 6px 10px;">
-                      <span class="text-xs text-muted">$</span>
-                      <input class="input reg-type-price" value="" placeholder="0" oninput="onPriceInput()" style="border:none; padding:0; background:transparent; width:42px; font-size: 13px; text-align: right;">
-                      <span class="text-xs text-muted reg-type-freelabel" style="margin-left: 4px;">Free</span>
+                <!-- Type 1: General — free, default -->
+                <div class="reg-type-row" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid var(--line);" onclick="openRegTypeModal(this)" data-name="General" data-price="" data-cap="">
+                  <div style="flex: 1;">
+                    <div class="flex items-center gap-8">
+                      <span class="font-600" style="font-size: 14px;">General</span>
+                      <span class="text-sm text-muted reg-type-pricetag">Free</span>
                     </div>
                   </div>
+                  <div class="flex items-center gap-8 text-sm text-muted">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <span>114</span>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
 
               </div>
@@ -3205,6 +3236,132 @@
     </div>
   </div>
 
+  <!-- ═══ REGISTRATION TYPE MODAL ═══ -->
+  <div id="regTypeModal" class="wizard-overlay" style="display:none;">
+    <div class="wizard-container" style="width: 460px;">
+      <div style="padding: 22px 24px 0; display: flex; align-items: flex-start; justify-content: space-between;">
+        <div class="flex items-center gap-10">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6 3 3 0 010 6 3 3 0 010 6H2a3 3 0 010-6 3 3 0 010-6z" opacity="0.15" fill="currentColor"/><path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 000-4z"/></svg>
+          </div>
+          <div>
+            <div class="text-lg font-600" id="regTypeModalTitle">New Registration Type</div>
+            <div class="text-xs text-muted">Free RSVP or paid ticket</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeRegTypeModal()" style="background:none; border:none; cursor:pointer; color: var(--muted); font-size: 20px; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="padding: 18px 24px; display: flex; flex-direction: column; gap: 16px; max-height: 70vh; overflow-y: auto;">
+        <!-- Name -->
+        <div>
+          <div class="input-label">Name</div>
+          <input class="input" id="rtName" placeholder="e.g. General, VIP, Member" style="width: 100%;">
+        </div>
+
+        <!-- Description (collapsible) -->
+        <div>
+          <div id="rtAddDescBtn" onclick="document.getElementById('rtDescWrap').style.display='block'; this.style.display='none';" style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 500;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add description
+          </div>
+          <div id="rtDescWrap" style="display: none;">
+            <textarea class="input" rows="2" placeholder="Shown to guests under the type name" style="width: 100%;"></textarea>
+          </div>
+        </div>
+
+        <!-- Free / Paid -->
+        <div>
+          <div class="input-label">Pricing</div>
+          <div class="q-chips" style="gap: 4px;">
+            <div class="q-chip active" id="rtChipFree" onclick="selectChip(this); rtSetPaid(false)" style="flex: 1; justify-content: center;">Free</div>
+            <div class="q-chip" id="rtChipPaid" onclick="selectChip(this); rtSetPaid(true)" style="flex: 1; justify-content: center;">Paid</div>
+          </div>
+          <div id="rtPriceWrap" style="display: none; margin-top: 10px;">
+            <div class="flex items-center gap-8">
+              <div class="flex items-center gap-4" style="border: 1px solid var(--border-light); border-radius: 8px; padding: 8px 12px; flex: 1;">
+                <span class="text-sm text-muted">$</span>
+                <input class="input" id="rtPrice" value="10" style="border:none; padding:0; background:transparent; flex: 1; font-size: 14px;">
+                <span class="text-xs text-muted">USD</span>
+              </div>
+            </div>
+            <label class="flex items-center justify-between" style="margin-top: 10px; cursor: pointer;">
+              <div>
+                <div class="text-sm font-500">Flexible pricing</div>
+                <div class="text-xs text-muted">Let guests pay what they want above the minimum</div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+            </label>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--line);"></div>
+
+        <!-- Capacity — validated against event capacity -->
+        <div>
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-500">Capacity</div>
+              <div class="text-xs text-muted" id="rtCapHelper">Leave blank for unlimited · 86 of 200 event capacity left</div>
+            </div>
+            <input class="input" id="rtCap" placeholder="∞" oninput="rtValidateCap()" style="width: 80px; text-align: center; font-size: 13px;">
+          </div>
+          <div id="rtCapWarning" style="display: none; margin-top: 8px; padding: 8px 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 12px; color: #dc2626;">
+            ⚠ Capacity can't exceed the 200 event capacity. We've capped it at the remaining 86 spots.
+          </div>
+        </div>
+
+        <!-- Require approval -->
+        <label class="flex items-center justify-between" style="cursor: pointer;">
+          <div>
+            <div class="text-sm font-500">Require approval</div>
+            <div class="text-xs text-muted">Manually approve each registration</div>
+          </div>
+          <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+        </label>
+
+        <!-- Sales window -->
+        <div>
+          <div class="text-sm font-500" style="margin-bottom: 8px;">Sales window</div>
+          <div class="card" style="padding: 0;">
+            <label class="flex items-center justify-between" style="padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer;">
+              <div>
+                <div class="text-sm">Sales start</div>
+                <div class="text-xs text-muted">Open registration at a set time</div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+            </label>
+            <label class="flex items-center justify-between" style="padding: 10px 14px; cursor: pointer;">
+              <div>
+                <div class="text-sm">Sales end</div>
+                <div class="text-xs text-muted">Close registration at a set time</div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Visibility -->
+        <label class="flex items-center justify-between" style="cursor: pointer;">
+          <div>
+            <div class="text-sm font-500">Hide on event page</div>
+            <div class="text-xs text-muted">Guests need an access code to register for this type</div>
+          </div>
+          <div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+        </label>
+      </div>
+
+      <div class="wizard-footer">
+        <button class="btn btn-sm" id="rtDeleteBtn" onclick="closeRegTypeModal()" style="display:none; color: #dc2626;">Delete</button>
+        <div></div>
+        <div class="flex gap-8">
+          <button class="btn btn-sm" onclick="closeRegTypeModal()">Cancel</button>
+          <button class="btn btn-sm btn-primary" onclick="closeRegTypeModal()" id="rtSaveBtn">Create type</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ═══ DATA ═══
     const events = [
@@ -3602,53 +3759,80 @@
       chip.classList.add('active');
     }
 
-    // ═══ REGISTRATION TYPES — free ↔ paid reactivity ═══
-    function onPriceInput() {
-      var anyPaid = false;
-      document.querySelectorAll('.reg-type-card').forEach(function(card) {
-        var priceInput = card.querySelector('.reg-type-price');
-        var freeLabel = card.querySelector('.reg-type-freelabel');
-        var raw = (priceInput.value || '').replace(/[^0-9.]/g, '');
-        var isPaid = raw !== '' && parseFloat(raw) > 0;
-        if (isPaid) {
-          anyPaid = true;
-          card.style.borderColor = 'var(--accent)';
-          card.style.boxShadow = '0 0 0 1px var(--accent-light)';
-          priceInput.style.color = 'var(--accent)';
-          priceInput.style.fontWeight = '600';
-          if (freeLabel) freeLabel.style.display = 'none';
-        } else {
-          card.style.borderColor = '';
-          card.style.boxShadow = '';
-          priceInput.style.color = '';
-          priceInput.style.fontWeight = '';
-          if (freeLabel) freeLabel.style.display = '';
-        }
+    // ═══ REGISTRATION TYPE MODAL ═══
+    var EVENT_CAPACITY = 200;        // matches the event-capacity setting
+    var rtEditingRow = null;          // the row being edited, or null for new
+
+    function rtCapacityUsedByOthers() {
+      // Sum capacities of all OTHER types (those with a numeric cap)
+      var used = 0;
+      document.querySelectorAll('#regTypesList .reg-type-row').forEach(function(row) {
+        if (row === rtEditingRow) return;
+        var c = parseInt(row.getAttribute('data-cap'), 10);
+        if (!isNaN(c)) used += c;
       });
-      // Show Stripe banner only when at least one type is paid
-      document.getElementById('stripeBanner').style.display = anyPaid ? 'block' : 'none';
+      return used;
     }
 
-    function addRegType() {
-      var list = document.getElementById('regTypesList');
-      var card = document.createElement('div');
-      card.className = 'card reg-type-card';
-      card.style.cssText = 'padding: 0; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;';
-      card.innerHTML =
-        '<div style="padding: 14px 16px; display: flex; align-items: center; gap: 12px;">' +
-          '<div style="flex: 1;">' +
-            '<input class="input reg-type-name" value="" placeholder="New type" style="border:none; padding:0; background:transparent; font-weight: 600; font-size: 14px; width: 100%;">' +
-            '<div class="text-xs text-muted" style="margin-top: 1px;"><span class="reg-type-count">0</span> registered</div>' +
-          '</div>' +
-          '<div class="flex items-center gap-3" style="flex-shrink: 0; border: 1px solid var(--border-light); border-radius: 8px; padding: 6px 10px;">' +
-            '<span class="text-xs text-muted">$</span>' +
-            '<input class="input reg-type-price" value="" placeholder="0" oninput="onPriceInput()" style="border:none; padding:0; background:transparent; width:42px; font-size: 13px; text-align: right;">' +
-            '<span class="text-xs text-muted reg-type-freelabel" style="margin-left: 4px;">Free</span>' +
-          '</div>' +
-          '<button class="btn-icon" onclick="this.closest(\'.reg-type-card\').remove(); onPriceInput();" title="Remove" style="font-size: 16px; flex-shrink: 0;">×</button>' +
-        '</div>';
-      list.appendChild(card);
-      card.querySelector('.reg-type-name').focus();
+    function rtRemainingCap() {
+      return Math.max(0, EVENT_CAPACITY - rtCapacityUsedByOthers());
+    }
+
+    function rtSetPaid(isPaid) {
+      document.getElementById('rtPriceWrap').style.display = isPaid ? 'block' : 'none';
+    }
+
+    function rtValidateCap() {
+      var input = document.getElementById('rtCap');
+      var warning = document.getElementById('rtCapWarning');
+      var remaining = rtRemainingCap();
+      var raw = (input.value || '').replace(/[^0-9]/g, '');
+      if (raw === '') { warning.style.display = 'none'; return; }
+      var val = parseInt(raw, 10);
+      if (val > remaining) {
+        // Cap it — this is the thing Luma fails
+        input.value = remaining;
+        warning.textContent = '⚠ Capacity can\'t exceed the ' + EVENT_CAPACITY + ' event capacity. Capped at the remaining ' + remaining + ' spots.';
+        warning.style.display = 'block';
+      } else {
+        warning.style.display = 'none';
+      }
+    }
+
+    function openRegTypeModal(row) {
+      rtEditingRow = row || null;
+      var isEdit = !!row;
+      document.getElementById('regTypeModalTitle').textContent = isEdit ? 'Edit Registration Type' : 'New Registration Type';
+      document.getElementById('rtSaveBtn').textContent = isEdit ? 'Save' : 'Create type';
+      document.getElementById('rtDeleteBtn').style.display = isEdit ? 'inline-flex' : 'none';
+
+      // Reset / populate
+      var name = isEdit ? (row.getAttribute('data-name') || '') : '';
+      var price = isEdit ? (row.getAttribute('data-price') || '') : '';
+      var cap = isEdit ? (row.getAttribute('data-cap') || '') : '';
+      document.getElementById('rtName').value = name;
+      document.getElementById('rtCap').value = cap;
+      var paid = price !== '' && parseFloat(price) > 0;
+      document.getElementById('rtPrice').value = paid ? price.replace(/[^0-9.]/g, '') : '10';
+      rtSetPaid(paid);
+      // chip states
+      document.getElementById('rtChipFree').classList.toggle('active', !paid);
+      document.getElementById('rtChipPaid').classList.toggle('active', paid);
+      // capacity helper
+      var remaining = rtRemainingCap();
+      document.getElementById('rtCapHelper').textContent = 'Leave blank for unlimited · ' + remaining + ' of ' + EVENT_CAPACITY + ' event capacity left';
+      document.getElementById('rtCapWarning').style.display = 'none';
+      // reset description
+      document.getElementById('rtDescWrap').style.display = 'none';
+      document.getElementById('rtAddDescBtn').style.display = 'flex';
+
+      document.getElementById('regTypeModal').style.display = 'flex';
+      setTimeout(function(){ document.getElementById('rtName').focus(); }, 50);
+    }
+
+    function closeRegTypeModal() {
+      document.getElementById('regTypeModal').style.display = 'none';
+      rtEditingRow = null;
     }
 
 
