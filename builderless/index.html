@@ -2286,7 +2286,10 @@
               <div id="addlGuestsBody" style="display: none; border-top: 1px solid var(--line);">
                 <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
                   <div class="text-sm">Max additional guests per registration</div>
-                  <input class="input" value="5" style="width: 56px; text-align: center; font-size: 13px; padding: 4px 8px;">
+                  <div class="flex items-center gap-6">
+                    <input class="input" id="maxGuestsInput" value="5" oninput="onMaxGuestsInput()" style="width: 56px; text-align: center; font-size: 13px; padding: 4px 8px;">
+                    <div class="q-chip" id="maxGuestsInfinite" onclick="toggleMaxGuestsInfinite()" title="No limit" style="padding: 4px 10px; font-size: 14px; line-height: 1;">∞</div>
+                  </div>
                 </div>
                 <div style="padding: 12px 16px; display: flex; align-items: flex-start; gap: 8px; background: var(--bg-subtle);">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -3749,6 +3752,27 @@
       document.getElementById('addlGuestsBody').style.display = on ? 'block' : 'none';
       // surface per-question "Asked of" scope only when guests are allowed
       document.getElementById('regFormBody').classList.toggle('allow-guests', on);
+    }
+
+    function onMaxGuestsInput() {
+      var raw = (document.getElementById('maxGuestsInput').value || '').replace(/[^0-9]/g, '');
+      document.getElementById('maxGuestsInfinite').classList.toggle('active', raw === '');
+    }
+
+    function toggleMaxGuestsInfinite() {
+      var chip = document.getElementById('maxGuestsInfinite');
+      var input = document.getElementById('maxGuestsInput');
+      var nowInfinite = !chip.classList.contains('active');
+      chip.classList.toggle('active', nowInfinite);
+      if (nowInfinite) {
+        input.value = '';
+        input.disabled = true;
+        input.style.opacity = '0.4';
+      } else {
+        input.value = '5';
+        input.disabled = false;
+        input.style.opacity = '';
+      }
     }
 
     // ═══ EVENT CAPACITY (finite or infinite) ═══
