@@ -667,6 +667,14 @@
       color: var(--muted);
       border: 1px dashed var(--border-light);
     }
+    .q-badge-scope {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+    /* "Each attendee" scope + the in-editor scope control only matter when additional guests are allowed */
+    #regFormBody:not(.allow-guests) .q-badge-scope { display: none; }
+    #regFormBody:not(.allow-guests) .q-scope-row { display: none; }
     .q-card-body {
       border-top: 1px solid var(--line);
       padding: 16px;
@@ -2233,10 +2241,32 @@
             <!-- ═══ QUESTIONS (asked once per registration) ═══ -->
             <div>
               <div class="reg-group-label">Questions</div>
-              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">Custom questions, asked once when someone registers.</div>
+              <div class="text-xs text-muted" style="margin-top: -4px; margin-bottom: 12px;">Custom questions asked during registration. Open one to choose who it's asked of.</div>
               <div class="flex flex-col" style="gap: 8px;" id="questionsList">
 
-                <div class="q-card" onclick="expandQuestion(this)">
+                <div class="q-card" onclick="expandQuestion(this)" data-scope="each">
+                  <div class="q-card-header">
+                    <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    <span class="q-card-title">Meal preference</span>
+                    <span class="q-badge q-badge-scope">Each attendee</span>
+                    <span class="q-badge q-badge-type">Dropdown</span>
+                    <span class="q-badge q-badge-optional">Required</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+
+                <div class="q-card" onclick="expandQuestion(this)" data-scope="each">
+                  <div class="q-card-header">
+                    <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                    <span class="q-card-title">Dietary restrictions</span>
+                    <span class="q-badge q-badge-scope">Each attendee</span>
+                    <span class="q-badge q-badge-type">Short text</span>
+                    <span class="q-badge q-badge-optional">Optional</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+
+                <div class="q-card" onclick="expandQuestion(this)" data-scope="registrant">
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">How did you hear about this event?</span>
@@ -2246,7 +2276,7 @@
                   </div>
                 </div>
 
-                <div class="q-card" onclick="expandQuestion(this)">
+                <div class="q-card" onclick="expandQuestion(this)" data-scope="registrant">
                   <div class="q-card-header">
                     <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                     <span class="q-card-title">Accessibility needs</span>
@@ -2265,51 +2295,19 @@
               <div style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
                 <div>
                   <div class="text-sm font-500">Additional guests</div>
-                  <div class="text-xs text-muted" style="margin-top: 1px;">Let one person register others — you'll collect their details too</div>
+                  <div class="text-xs text-muted" style="margin-top: 1px;">Let one person register others in the same form</div>
                 </div>
                 <div class="toggle" id="allowGuestsToggle" onclick="toggleAllowGuests()"><div class="toggle-knob"></div></div>
               </div>
-              <!-- Body — dimmed/disabled until the toggle is on -->
+              <!-- Body — shown when the toggle is on -->
               <div id="addlGuestsBody" style="display: none; border-top: 1px solid var(--line);">
                 <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line);">
                   <div class="text-sm">Max additional guests per registration</div>
                   <input class="input" value="5" style="width: 56px; text-align: center; font-size: 13px; padding: 4px 8px;">
                 </div>
-                <div style="padding: 12px 16px;">
-                  <div class="text-xs font-600" style="color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;">Collected for each guest</div>
-                  <div class="flex flex-col" style="gap: 6px;">
-                    <!-- Name always -->
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 8px; background: var(--white);">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
-                      <span class="text-sm font-500" style="flex: 1;">Name</span>
-                      <span class="text-xs text-muted">Always collected</span>
-                    </div>
-                    <!-- Per-guest question 1 -->
-                    <div class="q-card" onclick="expandQuestion(this)" style="background: var(--white);">
-                      <div class="q-card-header">
-                        <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                        <span class="q-card-title">Meal preference</span>
-                        <span class="q-badge q-badge-type">Dropdown</span>
-                        <span class="q-badge q-badge-optional">Required</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
-                      </div>
-                    </div>
-                    <!-- Per-guest question 2 -->
-                    <div class="q-card" onclick="expandQuestion(this)" style="background: var(--white);">
-                      <div class="q-card-header">
-                        <svg class="q-card-drag" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                        <span class="q-card-title">Dietary restrictions</span>
-                        <span class="q-badge q-badge-type">Short text</span>
-                        <span class="q-badge q-badge-optional">Optional</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--muted); flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
-                      </div>
-                    </div>
-                  </div>
-                  <button class="btn btn-sm" style="margin-top: 8px;" onclick="event.stopPropagation();">+ Add guest question</button>
-                  <div class="text-xs text-muted" style="margin-top: 8px; display: flex; align-items: flex-start; gap: 6px;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <span>These are asked only for additional guests. Keep them distinct from the questions above so guests aren't asked the same thing twice.</span>
-                  </div>
+                <div style="padding: 12px 16px; display: flex; align-items: flex-start; gap: 8px; background: var(--bg-subtle);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span class="text-xs" style="color: var(--ink);">Each guest is asked their <strong>name</strong>, plus any question above set to <strong>Each attendee</strong>. Open a question to choose who it's asked of — no need to recreate it.</span>
                 </div>
               </div>
             </div>
@@ -3766,6 +3764,8 @@
       toggle.classList.toggle('on');
       var on = toggle.classList.contains('on');
       document.getElementById('addlGuestsBody').style.display = on ? 'block' : 'none';
+      // reveal the per-question "Ask of" scope controls + Each-attendee badges
+      document.getElementById('regFormBody').classList.toggle('allow-guests', on);
     }
 
     // ═══ EVENT CAPACITY (finite or infinite) ═══
@@ -3920,6 +3920,14 @@
         return '<div class="q-chip' + (t === type ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">' + t + '</div>';
       }).join('');
       var reqA = required === 'Required';
+      var scope = card.getAttribute('data-scope') || 'registrant';
+      var eachActive = scope === 'each';
+      // "Ask of" scope — only relevant when additional guests are enabled (gated by CSS .q-scope-row)
+      var scopeRow =
+        '<div class="q-scope-row"><div class="q-row-label">Ask of</div><div class="q-chips">' +
+          '<div class="q-chip' + (!eachActive ? ' active' : '') + '" onclick="setQuestionScope(this, \'registrant\'); event.stopPropagation();">Person registering</div>' +
+          '<div class="q-chip' + (eachActive ? ' active' : '') + '" onclick="setQuestionScope(this, \'each\'); event.stopPropagation();">Each attendee</div>' +
+        '</div></div>';
       body.innerHTML =
         '<div><div class="q-row-label">Question</div>' +
           '<input class="input" value="' + title.replace(/"/g,'&quot;') + '" oninput="event.stopPropagation();" onclick="event.stopPropagation();" style="font-size: 13px;"></div>' +
@@ -3928,10 +3936,31 @@
           '<div class="q-chip' + (reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Required</div>' +
           '<div class="q-chip' + (!reqA ? ' active' : '') + '" onclick="selectChip(this); event.stopPropagation();">Optional</div>' +
         '</div></div>' +
+        (isBuiltIn ? '' : scopeRow) +
         (isBuiltIn
           ? '<div class="text-xs text-muted">Built-in field — included on every registration form.</div>'
           : '<div style="display:flex; justify-content:flex-end;"><button class="btn btn-sm" style="color: #dc2626;" onclick="event.stopPropagation(); this.closest(\'.q-card\').remove();">Delete question</button></div>');
       return body;
+    }
+
+    // Set a question's scope; sync the data attribute + the collapsed-row badge
+    function setQuestionScope(chip, scope) {
+      selectChip(chip);
+      var card = chip.closest('.q-card');
+      card.setAttribute('data-scope', scope);
+      var header = card.querySelector('.q-card-header');
+      var badge = header.querySelector('.q-badge-scope');
+      if (scope === 'each') {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'q-badge q-badge-scope';
+          badge.textContent = 'Each attendee';
+          badge.style.display = 'none'; // header badges hidden while expanded
+          header.insertBefore(badge, header.querySelector('.q-card-title').nextSibling);
+        }
+      } else if (badge) {
+        badge.remove();
+      }
     }
 
     function expandQuestion(card) {
