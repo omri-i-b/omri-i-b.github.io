@@ -62,9 +62,39 @@
     .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
     .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 15px; font-weight: 800; }
     .nav-center { display: flex; align-items: center; gap: 4px; }
-    .nav-center a { padding: 8px 12px; font-size: 14.5px; font-weight: 500; color: var(--ink-2); border-radius: 7px; display: flex; align-items: center; gap: 4px; transition: background .15s; }
-    .nav-center a:hover { background: var(--cream); }
-    .nav-center .caret { width: 8px; height: 8px; opacity: .5; }
+    .nav-trigger { padding: 8px 12px; font-size: 14.5px; font-weight: 500; color: var(--ink-2); border-radius: 7px; display: flex; align-items: center; gap: 4px; transition: background .15s; cursor: pointer; }
+    .nav-trigger:hover { background: var(--cream); }
+    .nav-center .caret { width: 8px; height: 8px; opacity: .5; transition: transform .2s; }
+    .nav-item { position: static; }
+    .nav-item.open .caret { transform: rotate(180deg); }
+    .nav-item.open .nav-trigger { background: var(--cream); }
+
+    /* mega menu */
+    .mega { position: absolute; top: calc(100% - 2px); left: 50%; z-index: 200;
+      background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg);
+      padding: 22px; opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translateX(-50%) translateY(8px); transition: opacity .16s ease, transform .16s ease; }
+    .nav-item.open .mega { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    .mega-grid { display: grid; gap: 22px; }
+    .mega-product .mega-grid { grid-template-columns: repeat(3, 198px) 232px; }
+    .mega-solutions .mega-grid { grid-template-columns: 206px 296px 232px; }
+    .mega-col h5 { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; padding: 0 8px 8px; }
+    .mega-link { display: flex; gap: 11px; padding: 8px; border-radius: 10px; transition: background .14s; }
+    .mega-link:hover { background: var(--cream); }
+    .mega-link .mic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 17px; flex-shrink: 0; }
+    .mega-link .mt { font-weight: 600; font-size: 14px; color: var(--ink); display: block; }
+    .mega-link .md { font-size: 12.5px; color: var(--body); display: block; margin-top: 1px; line-height: 1.35; }
+    .mega-link.sm { align-items: center; gap: 9px; padding: 9px 8px; }
+    .mega-link.sm .mic2 { font-size: 16px; width: 20px; text-align: center; }
+    .ind-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
+    .mega-feature { background: linear-gradient(160deg, var(--accent-soft), var(--cream)); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; }
+    .mf-badge { font-size: 11px; font-weight: 600; color: var(--accent); background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; align-self: flex-start; }
+    .mf-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 12px 0 4px; }
+    .mf-desc { font-size: 12.5px; color: var(--body); line-height: 1.45; }
+    .mf-link { font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 12px; }
+    .mf-sub { margin-top: auto; padding-top: 14px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(0,0,0,0.06); margin-top: 16px; }
+    .mf-sub a { font-size: 12.5px; font-weight: 500; color: var(--ink-2); }
+    .mf-sub a:hover { color: var(--accent); }
     .nav-right { display: flex; align-items: center; gap: 6px; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14.5px; border-radius: var(--radius-sm); padding: 9px 16px; cursor: pointer; border: 1px solid transparent; transition: all .15s; white-space: nowrap; }
     .btn-primary { background: var(--ink); color: #fff; }
@@ -273,12 +303,86 @@
     <div class="container nav-inner">
       <a href="#" class="brand"><span class="logo">C</span> Convene</a>
       <nav class="nav-center">
-        <a href="#">Product <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
-        <a href="#">Solutions <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
-        <a href="#">Resources <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
-        <a href="#">Enterprise</a>
-        <a href="#">Pricing</a>
-        <a href="#">Request a demo</a>
+        <!-- PRODUCT mega -->
+        <div class="nav-item" data-mega="product">
+          <a href="#" class="nav-trigger">Product <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+          <div class="mega mega-product" id="mega-product">
+            <div class="mega-grid">
+              <div class="mega-col">
+                <h5>Create</h5>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🎨</span><span><span class="mt">Event pages</span><span class="md">A beautiful page in 60 seconds</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">📝</span><span><span class="mt">Registration &amp; forms</span><span class="md">Custom questions, tiers, approvals</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">💌</span><span><span class="mt">Invitations</span><span class="md">Email &amp; SMS invites, RSVPs</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🧩</span><span><span class="mt">Templates</span><span class="md">Start from a proven layout</span></span></a>
+              </div>
+              <div class="mega-col">
+                <h5>Sell tickets</h5>
+                <a href="#" class="mega-link"><span class="mic" style="background:#fdecea;color:var(--accent-2)">🎟️</span><span><span class="mt">Ticketing</span><span class="md">Free, paid, or invite-only</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#fdecea;color:var(--accent-2)">💳</span><span><span class="mt">Payments &amp; payouts</span><span class="md">Stripe-powered, fast payouts</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#fdecea;color:var(--accent-2)">🏷️</span><span><span class="mt">Promo codes</span><span class="md">Early-bird &amp; referral discounts</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#fdecea;color:var(--accent-2)">🪑</span><span><span class="mt">Waitlists</span><span class="md">Auto-fill seats when guests drop</span></span></a>
+              </div>
+              <div class="mega-col">
+                <h5>Run the day</h5>
+                <a href="#" class="mega-link"><span class="mic" style="background:#e7f7ee;color:var(--accent-3)">✅</span><span><span class="mt">Check-in &amp; badges</span><span class="md">QR scan, on-arrival printing</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#e7f7ee;color:var(--accent-3)">📱</span><span><span class="mt">Mobile app</span><span class="md">Door scanning, live headcount</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#e7f7ee;color:var(--accent-3)">🗺️</span><span><span class="mt">Seating &amp; capacity</span><span class="md">Tables, zones, and limits</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:#e7f7ee;color:var(--accent-3)">🔔</span><span><span class="mt">Reminders</span><span class="md">Automated email &amp; SMS comms</span></span></a>
+              </div>
+              <div class="mega-feature">
+                <span class="mf-badge">✨ New</span>
+                <div class="mf-title">Convene AI</div>
+                <p class="mf-desc">Draft your event page, schedule reminders, and answer guest questions automatically.</p>
+                <a href="#" class="mf-link">Learn more →</a>
+                <div class="mf-sub">
+                  <a href="#">📊 Insights &amp; analytics</a>
+                  <a href="#">🔗 Integrations &amp; API</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLUTIONS mega -->
+        <div class="nav-item" data-mega="solutions">
+          <a href="#" class="nav-trigger">Solutions <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+          <div class="mega mega-solutions" id="mega-solutions">
+            <div class="mega-grid">
+              <div class="mega-col">
+                <h5>By use case</h5>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🎂</span><span><span class="mt">Personal &amp; social</span><span class="md">Birthdays, dinners, weddings</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🌍</span><span><span class="mt">Community &amp; meetups</span><span class="md">Recurring groups &amp; clubs</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🚀</span><span><span class="mt">Startups &amp; teams</span><span class="md">Offsites, launches, all-hands</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🏢</span><span><span class="mt">Enterprise</span><span class="md">SSO, security, scale to 50k</span></span></a>
+                <a href="#" class="mega-link"><span class="mic" style="background:var(--accent-soft);color:var(--accent)">🎙️</span><span><span class="mt">Creators</span><span class="md">Paid events &amp; memberships</span></span></a>
+              </div>
+              <div class="mega-col mega-col-wide">
+                <h5>By industry</h5>
+                <div class="ind-grid">
+                  <a href="#" class="mega-link sm"><span class="mic2">💻</span><span class="mt">Tech &amp; SaaS</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">🎓</span><span class="mt">Education</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">❤️</span><span class="mt">Nonprofits</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">🍸</span><span class="mt">Hospitality</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">🎵</span><span class="mt">Music &amp; nightlife</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">🏟️</span><span class="mt">Sports &amp; fitness</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">🧑‍💼</span><span class="mt">Corporate &amp; HR</span></a>
+                  <a href="#" class="mega-link sm"><span class="mic2">📣</span><span class="mt">Agencies</span></a>
+                </div>
+              </div>
+              <div class="mega-feature">
+                <span class="mf-badge">Customer stories</span>
+                <div class="mf-title">From 2 to 50,000 guests</div>
+                <p class="mf-desc">See how hosts at OpenAI, Figma, and Ramp — and first-time party planners — run it all on Convene.</p>
+                <a href="#" class="mf-link">Read the stories →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="#" class="nav-trigger">Resources <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+        <a href="#" class="nav-trigger">Enterprise</a>
+        <a href="#" class="nav-trigger">Pricing</a>
+        <a href="#" class="nav-trigger">Request a demo</a>
       </nav>
       <div class="nav-right">
         <a href="#" class="btn btn-accent">Get Convene free</a>
@@ -651,6 +755,24 @@
     // sticky nav border
     const nav = document.getElementById('nav');
     addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8));
+
+    // mega menus — open on hover (desktop) and toggle on click
+    const items = document.querySelectorAll('.nav-item[data-mega]');
+    let closeTimer;
+    const closeAll = (except) => items.forEach(it => { if (it !== except) it.classList.remove('open'); });
+    items.forEach(item => {
+      const trigger = item.querySelector('.nav-trigger');
+      item.addEventListener('mouseenter', () => { clearTimeout(closeTimer); closeAll(item); item.classList.add('open'); });
+      item.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => item.classList.remove('open'), 180); });
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isOpen = item.classList.contains('open');
+        closeAll();
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+    document.addEventListener('click', (e) => { if (!e.target.closest('.nav-item[data-mega]')) closeAll(); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
 
     // rotating hero word — re-query each tick so the reference never goes stale
     const words = ['birthdays', 'meetups', 'summits', 'weddings', 'launches', 'reunions', 'keynotes'];
