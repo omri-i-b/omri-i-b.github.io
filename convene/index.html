@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convene – The home for every event, from birthdays to boardrooms</title>
+  <meta name="description" content="Convene is the all-in-one event platform. Create a page, sell tickets, send invites, and check guests in — for a dinner party or a 10,000-person conference. Trusted by hosts at OpenAI, Figma, and Ramp.">
+  <link rel="canonical" href="https://convene.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Convene – The home for every event">
+  <meta property="og:description" content="Plan anything from a birthday to a global summit. Pages, tickets, RSVPs, and check-in — all in one place.">
+  <meta property="og:site_name" content="Convene">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236056e6'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EC%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink: #1c1c1a;
+      --ink-2: #37352f;
+      --body: #5b5a56;
+      --muted: #9b9a97;
+      --border: #ebeae8;
+      --border-2: #e3e2df;
+      --bg: #ffffff;
+      --bg-soft: #fbfbfa;
+      --cream: #f7f6f3;
+      --cream-2: #f1f0ec;
+
+      --accent: #6056e6;
+      --accent-hover: #4f44d6;
+      --accent-soft: #eeedfdff;
+      --accent-soft: #efeefe;
+      --accent-2: #f97362;   /* coral */
+      --accent-3: #36b37e;   /* green */
+      --accent-4: #f5b73d;   /* amber */
+      --accent-5: #4aa3ff;   /* blue */
+
+      --radius-sm: 8px;
+      --radius: 12px;
+      --radius-lg: 18px;
+      --maxw: 1184px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --shadow-sm: 0 1px 2px rgba(15,15,15,0.06), 0 1px 3px rgba(15,15,15,0.05);
+      --shadow: 0 10px 30px rgba(15,15,15,0.08), 0 2px 8px rgba(15,15,15,0.05);
+      --shadow-lg: 0 30px 70px rgba(15,15,15,0.14), 0 10px 24px rgba(15,15,15,0.08);
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+    body { font-family: var(--font); color: var(--ink); background: var(--bg); line-height: 1.5; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* ───────────────── NAV ───────────────── */
+    .nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.85); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+    .nav.scrolled { border-bottom-color: var(--border); }
+    .nav-inner { height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+    .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 15px; font-weight: 800; }
+    .nav-center { display: flex; align-items: center; gap: 4px; }
+    .nav-center a { padding: 8px 12px; font-size: 14.5px; font-weight: 500; color: var(--ink-2); border-radius: 7px; display: flex; align-items: center; gap: 4px; transition: background .15s; }
+    .nav-center a:hover { background: var(--cream); }
+    .nav-center .caret { width: 8px; height: 8px; opacity: .5; }
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14.5px; border-radius: var(--radius-sm); padding: 9px 16px; cursor: pointer; border: 1px solid transparent; transition: all .15s; white-space: nowrap; }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: #000; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: var(--accent-hover); }
+    .btn-ghost { background: #fff; color: var(--ink); border-color: var(--border-2); }
+    .btn-ghost:hover { background: var(--cream); }
+    .btn-link { font-size: 14.5px; font-weight: 500; padding: 9px 10px; }
+    .btn-link:hover { color: var(--accent); }
+
+    /* ───────────────── HERO ───────────────── */
+    .hero { position: relative; text-align: center; padding: 56px 0 24px; overflow: hidden; }
+    .floaties { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+    .floaty { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 24px; background: #fff; box-shadow: var(--shadow-sm); border: 1px solid var(--border); animation: bob 4s ease-in-out infinite; }
+    .floaty:nth-child(2n){ animation-delay: -1.2s; } .floaty:nth-child(3n){ animation-delay: -2.4s; } .floaty:nth-child(4n){ animation-delay: -0.6s; }
+    @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-7px);} }
+
+    h1.hero-title { font-size: clamp(40px, 7vw, 84px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; color: var(--ink); max-width: 960px; margin: 0 auto; }
+    .rotator { color: var(--accent); position: relative; display: inline-block; min-width: 0; }
+    .rotator .word { display: inline-block; animation: wordin .5s ease; }
+    @keyframes wordin { from { opacity:0; transform: translateY(0.25em); filter: blur(4px);} to { opacity:1; transform: none; filter: none; } }
+    .hero-sub { font-size: clamp(17px, 2vw, 20px); color: var(--body); max-width: 600px; margin: 22px auto 0; line-height: 1.55; }
+    .hero-cta { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+    .hero-cta .btn { padding: 11px 20px; font-size: 15px; }
+
+    /* hero product mockup */
+    .hero-media { margin: 44px auto 0; max-width: 1000px; }
+    .window { background: #fff; border: 1px solid var(--border-2); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .win-bar { display: flex; align-items: center; gap: 7px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-soft); }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+    .win-url { margin-left: 12px; font-size: 12.5px; color: var(--muted); background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; }
+    .app { display: grid; grid-template-columns: 210px 1fr; min-height: 440px; text-align: left; }
+    .app-side { background: var(--cream); border-right: 1px solid var(--border); padding: 16px 12px; font-size: 13px; }
+    .side-team { display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 6px; margin-bottom: 12px; }
+    .side-team .av { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+    .side-item { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 7px; color: var(--ink-2); }
+    .side-item .ic { width: 16px; text-align: center; }
+    .side-item.active { background: #fff; box-shadow: var(--shadow-sm); font-weight: 600; }
+    .side-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px 8px; font-weight: 600; }
+    .app-main { padding: 22px 24px; }
+    .crumb { font-size: 12.5px; color: var(--muted); }
+    .ev-head { display: flex; align-items: flex-start; justify-content: space-between; margin: 8px 0 18px; gap: 16px; }
+    .ev-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+    .ev-meta { font-size: 13px; color: var(--body); margin-top: 5px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+    .pill.live { background: #e7f7ee; color: #1a7a4d; }
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px; }
+    .stat { border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 14px; }
+    .stat .n { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .stat .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .guest-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 4px; border-top: 1px solid var(--border); font-size: 13.5px; }
+    .guest-l { display: flex; align-items: center; gap: 10px; }
+    .gav { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 12px; font-weight: 600; }
+    .tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+    .tag.vip { background: var(--accent-soft); color: var(--accent); }
+    .tag.in { background: #e7f7ee; color: #1a7a4d; }
+    .tag.wait { background: #fff3e0; color: #b5721a; }
+
+    /* ───────────────── TRUST STRIP ───────────────── */
+    .trust { padding: 40px 0 30px; }
+    .trust p { text-align: center; color: var(--muted); font-size: 14.5px; font-weight: 500; margin-bottom: 26px; }
+    .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+    .marquee-track { display: flex; gap: 56px; width: max-content; animation: scroll 38s linear infinite; }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes scroll { to { transform: translateX(-50%); } }
+    .wordmark { font-size: 21px; font-weight: 700; color: #b6b5b0; letter-spacing: -0.02em; white-space: nowrap; filter: grayscale(1); transition: color .2s; }
+
+    /* ───────────────── SECTION SHELL ───────────────── */
+    section.block { padding: 64px 0; }
+    section.block.tint { background: var(--bg-soft); }
+    .sec-title { font-size: clamp(28px, 4vw, 42px); font-weight: 700; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 34px; max-width: 760px; }
+    .kicker { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: none; letter-spacing: .01em; }
+
+    /* automations section */
+    .auto-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
+    .auto-card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px; }
+    .auto-card h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 18px; display: flex; align-items: center; gap: 8px; }
+    .auto-list { display: flex; flex-direction: column; gap: 2px; }
+    .auto-item { display: flex; gap: 13px; padding: 12px; border-radius: var(--radius); transition: background .15s; cursor: pointer; }
+    .auto-item:hover { background: #fff; box-shadow: var(--shadow-sm); }
+    .auto-ic { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+    .auto-item h4 { font-size: 15px; font-weight: 600; }
+    .auto-item p { font-size: 13.5px; color: var(--body); margin-top: 2px; }
+    .auto-link { margin-top: 16px; font-weight: 600; font-size: 14.5px; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+    .auto-link:hover { color: var(--accent); }
+    .auto-link .arr { transition: transform .2s; }
+    .auto-link:hover .arr { transform: translateX(3px); }
+    .tiles { display: flex; flex-direction: column; gap: 10px; }
+    .tile { display: flex; align-items: center; gap: 13px; background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; font-weight: 600; font-size: 15px; transition: all .15s; cursor: pointer; }
+    .tile:hover { background: #fff; box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .tile .arr { margin-left: auto; color: var(--muted); transition: transform .2s; }
+    .tile:hover .arr { transform: translateX(3px); color: var(--accent); }
+    .tile.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .tile.dark .arr { color: rgba(255,255,255,.7); }
+
+    /* feature card rows (sections 2 & 3) */
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feat { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0; overflow: hidden; display: flex; flex-direction: column; border-left: 3px solid var(--c, var(--accent)); transition: transform .2s, box-shadow .2s; }
+    .feat:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .feat .feat-body { padding: 22px 24px 6px; }
+    .feat .kicker { color: var(--c, var(--accent)); }
+    .feat h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-top: 5px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .feat h3 .arr { color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+    .feat:hover h3 .arr { transform: translateX(3px); color: var(--c, var(--accent)); }
+    .feat-art { margin: 18px 24px 24px; border-radius: var(--radius); border: 1px solid var(--border); background: #fff; min-height: 168px; overflow: hidden; box-shadow: var(--shadow-sm); }
+
+    /* mini mockups inside feature cards */
+    .mini { padding: 14px; font-size: 12px; }
+    .mini-bar { display: flex; gap: 5px; margin-bottom: 11px; }
+    .mini-bar .d { width: 7px; height: 7px; border-radius: 50%; background: var(--border-2); }
+    .ev-mini { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .ev-mini .cover { height: 64px; background: linear-gradient(120deg, #6056e6, #9d5bdd); }
+    .ev-mini .cover.b { background: linear-gradient(120deg, #f97362, #f5b73d); }
+    .ev-mini .body { padding: 9px 11px; }
+    .ev-mini .t { font-weight: 700; font-size: 13px; }
+    .ev-mini .m { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .tk { display: flex; align-items: center; justify-content: space-between; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; font-size: 12px; }
+    .tk b { font-weight: 700; }
+    .tk .price { font-weight: 700; color: var(--accent); }
+    .scan { display: grid; place-items: center; gap: 9px; padding: 8px; }
+    .qr { width: 78px; height: 78px; border-radius: 10px; background:
+        repeating-linear-gradient(0deg, var(--ink) 0 4px, #fff 4px 8px),
+        repeating-linear-gradient(90deg, var(--ink) 0 4px, #fff 4px 8px); background-blend-mode: multiply; opacity:.85; }
+    .scan .ok { font-size: 12px; font-weight: 700; color: #1a7a4d; display: flex; align-items: center; gap: 6px; }
+    .bars { display: flex; align-items: flex-end; gap: 8px; height: 90px; padding: 10px 6px 0; }
+    .bars i { flex: 1; background: var(--accent-soft); border-radius: 5px 5px 0 0; display: block; }
+    .bars i.hi { background: var(--accent); }
+    .row-mini { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-top: 1px solid var(--border); font-size: 12px; }
+    .row-mini:first-child{border-top:none;}
+
+    /* pull quote */
+    .pull { padding: 56px 0; text-align: center; }
+    .pull q { font-size: clamp(24px, 3.4vw, 34px); font-weight: 700; letter-spacing: -0.025em; quotes: "“" "”"; }
+    .pull .src { margin-top: 16px; font-weight: 700; font-size: 16px; color: var(--muted); letter-spacing: .02em; }
+
+    /* testimonials */
+    .tgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .tcard { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; }
+    .tcard.feature { grid-column: span 2; grid-row: span 2; background: var(--ink); color: #fff; }
+    .tcard.feature .tlogo { color: #fff; }
+    .tlogo { font-weight: 700; font-size: 16px; color: #9b9a97; letter-spacing: -0.01em; margin-bottom: 16px; filter: grayscale(1); }
+    .tcard blockquote { font-size: 15px; line-height: 1.5; font-weight: 500; }
+    .tcard.feature blockquote { font-size: clamp(20px, 2.4vw, 28px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.32; }
+    .tcard .who { margin-top: auto; padding-top: 18px; font-size: 13px; color: var(--muted); }
+    .tcard.feature .who { color: rgba(255,255,255,.65); }
+    .tstory { margin-top: 18px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; color: #fff; }
+    .tstory .arr { transition: transform .2s; } .tstory:hover .arr{ transform: translateX(3px); }
+
+    .stats-marquee { margin-top: 26px; }
+    .stats-marquee .marquee-track { gap: 0; animation-duration: 30s; }
+    .stat-chip { display: flex; align-items: center; font-weight: 600; font-size: 15px; color: var(--ink-2); white-space: nowrap; padding: 0 28px; }
+    .stat-chip::after { content: ""; }
+    .stat-chip b { color: var(--accent); margin-right: 6px; }
+    .dotsep { width: 5px; height: 5px; border-radius: 50%; background: var(--border-2); align-self: center; }
+
+    /* try for free */
+    .dl-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; }
+    .dl { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px; background: var(--cream); display: flex; flex-direction: column; min-height: 220px; }
+    .dl.lead { background: linear-gradient(150deg, #efeefe, #fbfbfa); }
+    .dl .ic { font-size: 26px; }
+    .dl h3 { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin: 14px 0 6px; }
+    .dl p { font-size: 14px; color: var(--body); }
+    .dl .btn { margin-top: auto; align-self: flex-start; }
+    .caption { text-align: center; color: var(--muted); font-size: 14px; margin-top: 28px; }
+
+    /* footer */
+    footer { border-top: 1px solid var(--border); padding: 56px 0 40px; background: var(--bg-soft); }
+    .foot-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; }
+    .foot-brand .brand { margin-bottom: 18px; }
+    .foot-social { display: flex; gap: 12px; margin-bottom: 22px; }
+    .foot-social a { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border-2); display: grid; place-items: center; color: var(--body); font-size: 14px; transition: all .15s; }
+    .foot-social a:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .foot-legal { font-size: 12.5px; color: var(--muted); line-height: 2; }
+    .foot-legal a:hover { color: var(--ink); }
+    .foot-col h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 14px; font-weight: 600; }
+    .foot-col a { display: block; font-size: 14px; color: var(--body); padding: 5px 0; }
+    .foot-col a:hover { color: var(--ink); }
+    .foot-col a.more { color: var(--accent); font-weight: 600; }
+
+    /* responsive */
+    @media (max-width: 900px) {
+      .nav-center { display: none; }
+      .auto-grid, .feat-grid, .tgrid, .dl-grid, .foot-grid { grid-template-columns: 1fr; }
+      .tcard.feature { grid-column: auto; grid-row: auto; }
+      .foot-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .foot-brand { grid-column: 1 / -1; }
+      .app { grid-template-columns: 1fr; }
+      .app-side { display: none; }
+      .stat-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .floaty { width: 44px; height: 44px; font-size: 20px; }
+      .hero-cta .btn { width: 100%; }
+      .stat-row { grid-template-columns: repeat(3,1fr); }
+      .stat .n { font-size: 17px; }
+      .foot-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#" class="brand"><span class="logo">C</span> Convene</a>
+      <nav class="nav-center">
+        <a href="#">Product <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+        <a href="#">Solutions <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+        <a href="#">Resources <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+        <a href="#">Enterprise</a>
+        <a href="#">Pricing</a>
+        <a href="#">Request a demo</a>
+      </nav>
+      <div class="nav-right">
+        <a href="#" class="btn btn-accent">Get Convene free</a>
+        <a href="#" class="btn btn-link">Log in</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="floaties">
+        <span class="floaty">🎉</span><span class="floaty">🎂</span><span class="floaty">🎟️</span>
+        <span class="floaty">🥂</span><span class="floaty">🎤</span><span class="floaty">📅</span>
+        <span class="floaty">💌</span>
+      </div>
+      <h1 class="hero-title">Where <span class="rotator"><span class="word" id="rotword">birthdays</span></span><br>come together.</h1>
+      <p class="hero-sub">Create a page, sell tickets, send invites, and check guests in — for a backyard dinner or a 10,000-person conference. One place for every event.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-accent">Get Convene free</a>
+        <a href="#" class="btn btn-ghost">Request a demo</a>
+      </div>
+
+      <!-- hero product mockup -->
+      <div class="hero-media">
+        <div class="window">
+          <div class="win-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="win-url">convene.com/maya-turns-30</span>
+          </div>
+          <div class="app">
+            <aside class="app-side">
+              <div class="side-team"><span class="av">M</span> Maya's Events</div>
+              <div class="side-item active"><span class="ic">🎉</span> Maya's 30th</div>
+              <div class="side-item"><span class="ic">🎟️</span> Summer Launch</div>
+              <div class="side-item"><span class="ic">🎤</span> Q3 All-Hands</div>
+              <div class="side-label">Manage</div>
+              <div class="side-item"><span class="ic">👥</span> Guests</div>
+              <div class="side-item"><span class="ic">✉️</span> Invites</div>
+              <div class="side-item"><span class="ic">📊</span> Insights</div>
+            </aside>
+            <main class="app-main">
+              <div class="crumb">Events › Maya's 30th Birthday</div>
+              <div class="ev-head">
+                <div>
+                  <div class="ev-title">Maya's 30th Birthday 🎉</div>
+                  <div class="ev-meta">
+                    <span>📅 Sat, Jul 12 · 7:00 PM</span>
+                    <span>📍 The Rooftop, Brooklyn</span>
+                  </div>
+                </div>
+                <span class="pill live">● Live</span>
+              </div>
+              <div class="stat-row">
+                <div class="stat"><div class="n">86</div><div class="l">Going</div></div>
+                <div class="stat"><div class="n">12</div><div class="l">Waitlist</div></div>
+                <div class="stat"><div class="n">$1,240</div><div class="l">Collected</div></div>
+              </div>
+              <div class="guest-row">
+                <div class="guest-l"><span class="gav" style="background:#6056e6">JL</span> Jordan Lee</div>
+                <span class="tag vip">VIP</span>
+              </div>
+              <div class="guest-row">
+                <div class="guest-l"><span class="gav" style="background:#f97362">SP</span> Sam Park</div>
+                <span class="tag in">Checked in</span>
+              </div>
+              <div class="guest-row">
+                <div class="guest-l"><span class="gav" style="background:#36b37e">AR</span> Ana Rivera</div>
+                <span class="tag in">Checked in</span>
+              </div>
+              <div class="guest-row">
+                <div class="guest-l"><span class="gav" style="background:#f5b73d">TN</span> Theo Novak</div>
+                <span class="tag wait">Waitlist</span>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <div class="trust">
+    <div class="container">
+      <p>Trusted for 2M+ events — from house parties to global summits</p>
+    </div>
+    <div class="marquee">
+      <div class="marquee-track">
+        <span class="wordmark">OpenAI</span><span class="wordmark">Figma</span><span class="wordmark">Ramp</span>
+        <span class="wordmark">Stripe</span><span class="wordmark">Vercel</span><span class="wordmark">Linear</span>
+        <span class="wordmark">Notion</span><span class="wordmark">Discord</span><span class="wordmark">Airbnb</span>
+        <span class="wordmark">Spotify</span><span class="wordmark">Anthropic</span><span class="wordmark">Cursor</span>
+        <!-- duplicate for seamless loop -->
+        <span class="wordmark">OpenAI</span><span class="wordmark">Figma</span><span class="wordmark">Ramp</span>
+        <span class="wordmark">Stripe</span><span class="wordmark">Vercel</span><span class="wordmark">Linear</span>
+        <span class="wordmark">Notion</span><span class="wordmark">Discord</span><span class="wordmark">Airbnb</span>
+        <span class="wordmark">Spotify</span><span class="wordmark">Anthropic</span><span class="wordmark">Cursor</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: AUTOMATIONS -->
+  <section class="block tint">
+    <div class="container">
+      <h2 class="sec-title">The event runs itself.</h2>
+      <div class="auto-grid">
+        <div class="auto-card">
+          <span class="kicker">Automations</span>
+          <h3>Put the busywork on autopilot.</h3>
+          <div class="auto-list">
+            <div class="auto-item">
+              <span class="auto-ic" style="background:var(--accent-soft);color:var(--accent)">⏰</span>
+              <div><h4>Reminders</h4><p>Email and text every guest before doors open — automatically.</p></div>
+            </div>
+            <div class="auto-item">
+              <span class="auto-ic" style="background:#fdecea;color:var(--accent-2)">🪑</span>
+              <div><h4>Waitlist &amp; approvals</h4><p>Backfill seats the moment someone drops, no manual chasing.</p></div>
+            </div>
+            <div class="auto-item">
+              <span class="auto-ic" style="background:#e7f7ee;color:var(--accent-3)">✅</span>
+              <div><h4>Check-in agent</h4><p>Scan a QR, print a badge, update the headcount instantly.</p></div>
+            </div>
+            <div class="auto-item">
+              <span class="auto-ic" style="background:#fff3e0;color:#b5721a">💌</span>
+              <div><h4>Follow-ups</h4><p>Thank-yous, surveys, and replays sent right on schedule.</p></div>
+            </div>
+          </div>
+          <a href="#" class="auto-link">See what Convene can automate <span class="arr">→</span></a>
+        </div>
+        <div class="tiles">
+          <div class="tile"><span>🎟️</span> Sell tickets in minutes <span class="arr">→</span></div>
+          <div class="tile"><span>💬</span> Collect RSVPs in Slack <span class="arr">→</span></div>
+          <div class="tile"><span>🪪</span> Print badges on arrival <span class="arr">→</span></div>
+          <div class="tile"><span>📆</span> Sync to Google Calendar <span class="arr">→</span></div>
+          <div class="tile dark"><span>⚡</span> Build your own workflow <span class="arr">→</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: BUILT FOR ANY GUEST LIST -->
+  <section class="block">
+    <div class="container">
+      <h2 class="sec-title">Built for any guest list.</h2>
+      <div class="feat-grid">
+        <div class="feat" style="--c:var(--accent)">
+          <div class="feat-body">
+            <span class="kicker">Event pages</span>
+            <h3>A beautiful page in 60 seconds <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="ev-mini">
+              <div class="cover"></div>
+              <div class="body"><div class="t">Maya's 30th 🎉</div><div class="m">Sat, Jul 12 · The Rooftop</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="feat" style="--c:var(--accent-2)">
+          <div class="feat-body">
+            <span class="kicker">Ticketing &amp; RSVPs</span>
+            <h3>Free, paid, or invite-only <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="tk"><span><b>General</b> · 220 left</span><span class="price">Free</span></div>
+            <div class="tk"><span><b>VIP table</b> · 6 left</span><span class="price">$45</span></div>
+            <div class="tk"><span><b>Backstage</b> · invite</span><span class="price">$120</span></div>
+          </div>
+        </div>
+        <div class="feat" style="--c:var(--accent-3)">
+          <div class="feat-body">
+            <span class="kicker">Check-in</span>
+            <h3>No lines at the door <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="scan">
+              <div class="qr"></div>
+              <div class="ok">✓ Sam Park — checked in</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: ONE PLACE -->
+  <section class="block tint">
+    <div class="container">
+      <h2 class="sec-title">One place for the whole event.</h2>
+      <div class="feat-grid">
+        <div class="feat" style="--c:var(--accent-5)">
+          <div class="feat-body">
+            <span class="kicker">Guest list</span>
+            <h3>Know exactly who's coming <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="row-mini"><span class="gav" style="width:22px;height:22px;font-size:10px;background:#6056e6">JL</span> Jordan Lee <span style="margin-left:auto" class="tag vip">VIP</span></div>
+            <div class="row-mini"><span class="gav" style="width:22px;height:22px;font-size:10px;background:#36b37e">AR</span> Ana Rivera <span style="margin-left:auto" class="tag in">In</span></div>
+            <div class="row-mini"><span class="gav" style="width:22px;height:22px;font-size:10px;background:#f97362">SP</span> Sam Park <span style="margin-left:auto" class="tag in">In</span></div>
+            <div class="row-mini"><span class="gav" style="width:22px;height:22px;font-size:10px;background:#f5b73d">TN</span> Theo Novak <span style="margin-left:auto" class="tag wait">Wait</span></div>
+          </div>
+        </div>
+        <div class="feat" style="--c:var(--accent-4)">
+          <div class="feat-body">
+            <span class="kicker">Registration</span>
+            <h3>Forms, tiers, and discounts <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="tk"><span><b>Name &amp; email</b></span><span style="color:var(--muted)">Required</span></div>
+            <div class="tk"><span><b>Dietary needs</b></span><span style="color:var(--muted)">Optional</span></div>
+            <div class="tk"><span><b>Promo: EARLYBIRD</b></span><span class="price">−20%</span></div>
+          </div>
+        </div>
+        <div class="feat" style="--c:var(--accent)">
+          <div class="feat-body">
+            <span class="kicker">Insights</span>
+            <h3>See what's working, live <span class="arr">→</span></h3>
+          </div>
+          <div class="feat-art mini">
+            <div class="bars"><i style="height:40%"></i><i style="height:62%"></i><i style="height:48%"></i><i class="hi" style="height:88%"></i><i style="height:70%"></i><i style="height:55%"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULL QUOTE -->
+  <div class="pull">
+    <div class="container">
+      <q>Honestly, the only event tool you'll ever need.</q>
+      <div class="src">TechCrunch</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: TESTIMONIALS -->
+  <section class="block">
+    <div class="container">
+      <h2 class="sec-title">Loved by hosts everywhere.</h2>
+      <div class="tgrid">
+        <div class="tcard feature">
+          <div class="tlogo">OpenAI</div>
+          <blockquote>“We run every offsite, launch party, and 5,000-person dev day on Convene. One platform, zero chaos — and people actually enjoy registering.”</blockquote>
+          <div class="who">Events Lead, OpenAI</div>
+          <a href="#" class="tstory">Read the full story <span class="arr">→</span></a>
+        </div>
+        <div class="tcard">
+          <div class="tlogo">Figma</div>
+          <blockquote>“Our community meetups in 40 cities all run on Convene. Setup takes minutes.”</blockquote>
+          <div class="who">Community team, Figma</div>
+        </div>
+        <div class="tcard">
+          <div class="tlogo">Ramp</div>
+          <blockquote>“Sold out our 800-seat summit without ever touching a spreadsheet.”</blockquote>
+          <div class="who">Marketing, Ramp</div>
+        </div>
+        <div class="tcard">
+          <blockquote>“I planned my daughter's birthday in ten minutes flat — invites, RSVPs, the works.”</blockquote>
+          <div class="who">Priya, parent &amp; first-time host</div>
+        </div>
+        <div class="tcard">
+          <blockquote>“Check-in used to take an hour. Now it's instant, and the line never forms.”</blockquote>
+          <div class="who">Operations, Linear</div>
+        </div>
+        <div class="tcard">
+          <blockquote>“Same tool for our book club and our company all-hands. That's the magic.”</blockquote>
+          <div class="who">Marcus, host of 4 a month</div>
+        </div>
+      </div>
+
+      <div class="marquee stats-marquee">
+        <div class="marquee-track">
+          <span class="stat-chip"><b>2M+</b> events hosted</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>60%</b> of the Forbes Cloud 100</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>#1</b> rated event platform (G2)</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>12M+</b> tickets sold</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>140+</b> countries</span><span class="dotsep"></span>
+          <span class="stat-chip">From <b>2</b> to <b>50,000</b> guests</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>2M+</b> events hosted</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>60%</b> of the Forbes Cloud 100</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>#1</b> rated event platform (G2)</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>12M+</b> tickets sold</span><span class="dotsep"></span>
+          <span class="stat-chip"><b>140+</b> countries</span><span class="dotsep"></span>
+          <span class="stat-chip">From <b>2</b> to <b>50,000</b> guests</span><span class="dotsep"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: TRY FOR FREE -->
+  <section class="block tint">
+    <div class="container">
+      <h2 class="sec-title">Try for free.</h2>
+      <div class="dl-grid">
+        <div class="dl lead">
+          <span class="ic">🎉</span>
+          <h3>Get started on Convene</h3>
+          <p>Your first event is free in minutes — page, RSVPs, and reminders included.</p>
+          <a href="#" class="btn btn-accent">Create an event</a>
+        </div>
+        <div class="dl">
+          <span class="ic">📱</span>
+          <h3>Convene Mobile</h3>
+          <p>Check guests in and watch RSVPs roll in, right from your phone.</p>
+          <a href="#" class="btn btn-ghost">Download</a>
+        </div>
+        <div class="dl">
+          <span class="ic">🏢</span>
+          <h3>Convene for Teams</h3>
+          <p>Branding, roles, SSO, and invoicing for orgs that run events at scale.</p>
+          <a href="#" class="btn btn-ghost">Talk to sales</a>
+        </div>
+      </div>
+      <p class="caption">Convene works right in your browser, too.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="brand"><span class="logo">C</span> Convene</a>
+        <div class="foot-social">
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="Instagram">◎</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+          <a href="#" aria-label="YouTube">▶</a>
+        </div>
+        <div class="foot-legal">
+          <div>English (US)</div>
+          <a href="#">Do Not Sell or Share My Info</a><br>
+          <a href="#">Cookie settings</a><br>
+          © 2026 Convene, Inc.
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#">Event pages</a>
+        <a href="#">Ticketing</a>
+        <a href="#">Check-in</a>
+        <a href="#">Registration</a>
+        <a href="#">Mobile app</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#">About us</a>
+        <a href="#">Careers</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+        <a href="#">Terms &amp; privacy</a>
+      </div>
+      <div class="foot-col">
+        <h4>Resources</h4>
+        <a href="#">Help center</a>
+        <a href="#">Pricing</a>
+        <a href="#">Blog</a>
+        <a href="#">Community</a>
+        <a href="#">Templates</a>
+      </div>
+      <div class="foot-col">
+        <h4>Convene for</h4>
+        <a href="#">Enterprise</a>
+        <a href="#">Teams</a>
+        <a href="#">Creators</a>
+        <a href="#">Personal</a>
+        <a href="#" class="more">Explore more →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // sticky nav border
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8));
+
+    // rotating hero word — re-query each tick so the reference never goes stale
+    const words = ['birthdays', 'meetups', 'summits', 'weddings', 'launches', 'reunions', 'keynotes'];
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % words.length;
+      const current = document.getElementById('rotword');
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.id = 'rotword';
+      span.textContent = words[i];
+      current.replaceWith(span);
+    }, 2200);
+  </script>
+</body>
+</html>
