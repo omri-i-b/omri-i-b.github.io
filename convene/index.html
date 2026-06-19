@@ -276,8 +276,50 @@
     .foot-col a:hover { color: var(--ink); }
     .foot-col a.more { color: var(--accent); font-weight: 600; }
 
+    /* pricing */
+    .sec-title.center { margin-left: auto; margin-right: auto; text-align: center; }
+    .price-intro { text-align: center; color: var(--body); max-width: 560px; margin: -20px auto 28px; font-size: 16px; }
+    .bill-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 34px; font-size: 14px; color: var(--muted); font-weight: 500; }
+    .bill-toggle .toggle-active { color: var(--ink); font-weight: 600; }
+    .switch { position: relative; width: 46px; height: 27px; border-radius: 999px; background: var(--border-2); cursor: pointer; transition: background .2s; border: none; padding: 0; }
+    .switch.on { background: var(--accent); }
+    .switch .knob { position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: var(--shadow-sm); }
+    .switch.on .knob { transform: translateX(19px); }
+    .save-badge { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 9px; }
+
+    .price-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: stretch; }
+    .pcard { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 22px; background: #fff; display: flex; flex-direction: column; }
+    .pcard.popular { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); position: relative; }
+    .pop-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; letter-spacing: .02em; white-space: nowrap; }
+    .pcard .ptier { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+    .pcard .pwho { font-size: 12.5px; color: var(--muted); margin-top: 3px; min-height: 34px; }
+    .pcard .pprice { font-size: 36px; font-weight: 800; letter-spacing: -0.035em; margin-top: 10px; line-height: 1; }
+    .pcard .pprice small { font-size: 14px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+    .pcard .pper { font-size: 12.5px; color: var(--muted); min-height: 20px; margin-top: 7px; }
+    .pcard .btn { width: 100%; margin: 18px 0; }
+    .pcard .pfeats { list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+    .pcard .pfeats li { display: flex; gap: 8px; color: var(--ink-2); line-height: 1.35; }
+    .pcard .pfeats .ck { color: var(--accent); flex-shrink: 0; font-weight: 700; }
+    .pcard .pfeats .lead { font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 0; }
+    .fee-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
+
+    .compare-wrap { margin-top: 44px; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); }
+    .compare { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 14px; }
+    .compare th, .compare td { padding: 13px 18px; text-align: center; border-bottom: 1px solid var(--border); }
+    .compare th:first-child, .compare td:first-child { text-align: left; }
+    .compare thead th { font-size: 15px; font-weight: 700; padding: 18px; background: var(--bg-soft); }
+    .compare thead th small { display: block; font-weight: 500; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .compare thead th.pop { color: var(--accent); }
+    .compare tbody tr:last-child td { border-bottom: none; }
+    .compare .cat td { background: var(--bg-soft); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .compare .yes { color: var(--accent); font-weight: 700; }
+    .compare .no { color: var(--border-2); }
+    .compare td.val { font-weight: 500; color: var(--ink-2); }
+    .compare td.label { color: var(--ink-2); font-weight: 500; }
+
     /* responsive */
     @media (max-width: 900px) {
+      .price-cards { grid-template-columns: 1fr 1fr; }
       .nav-center { display: none; }
       .auto-grid, .feat-grid, .tgrid, .dl-grid, .foot-grid { grid-template-columns: 1fr; }
       .tcard.feature { grid-column: auto; grid-row: auto; }
@@ -293,6 +335,7 @@
       .stat-row { grid-template-columns: repeat(3,1fr); }
       .stat .n { font-size: 17px; }
       .foot-grid { grid-template-columns: 1fr; }
+      .price-cards { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -381,7 +424,7 @@
 
         <a href="#" class="nav-trigger">Resources <svg class="caret" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
         <a href="#" class="nav-trigger">Enterprise</a>
-        <a href="#" class="nav-trigger">Pricing</a>
+        <a href="#pricing" class="nav-trigger">Pricing</a>
         <a href="#" class="nav-trigger">Request a demo</a>
       </nav>
       <div class="nav-right">
@@ -670,6 +713,143 @@
     </div>
   </section>
 
+  <!-- PRICING -->
+  <section class="block" id="pricing">
+    <div class="container">
+      <h2 class="sec-title center">Pricing that grows with your guest list.</h2>
+      <p class="price-intro">Start free for personal events. Scale up to paid ticketing, event teams, and enterprise security as you grow — same platform the whole way.</p>
+
+      <div class="bill-toggle">
+        <span id="lbl-month">Monthly</span>
+        <button class="switch on" id="billswitch" aria-label="Toggle billing period"><span class="knob"></span></button>
+        <span id="lbl-year" class="toggle-active">Annual</span>
+        <span class="save-badge">Save 20%</span>
+      </div>
+
+      <div class="price-cards">
+        <!-- FREE -->
+        <div class="pcard">
+          <div class="ptier">Free</div>
+          <div class="pwho">For personal events &amp; parties</div>
+          <div class="pprice">$0</div>
+          <div class="pper">Free forever</div>
+          <a href="#" class="btn btn-ghost">Get started</a>
+          <ul class="pfeats">
+            <li><span class="ck">✓</span> Unlimited free events</li>
+            <li><span class="ck">✓</span> Up to 250 guests / event</li>
+            <li><span class="ck">✓</span> Invites, RSVPs &amp; waitlist</li>
+            <li><span class="ck">✓</span> Mobile check-in</li>
+          </ul>
+        </div>
+        <!-- PRO -->
+        <div class="pcard popular">
+          <span class="pop-badge">Most popular</span>
+          <div class="ptier">Pro</div>
+          <div class="pwho">For creators &amp; small teams</div>
+          <div class="pprice"><span data-m="24" data-a="19">$19</span><small>/mo</small></div>
+          <div class="pper" id="per-pro">billed annually</div>
+          <a href="#" class="btn btn-accent">Start free trial</a>
+          <ul class="pfeats">
+            <li class="lead">Everything in Free, plus</li>
+            <li><span class="ck">✓</span> Paid ticketing (2.5% + $0.99)</li>
+            <li><span class="ck">✓</span> Custom branding &amp; domain</li>
+            <li><span class="ck">✓</span> Up to 2,000 guests</li>
+            <li><span class="ck">✓</span> Recurring events &amp; promo codes</li>
+            <li><span class="ck">✓</span> Automated reminders</li>
+          </ul>
+        </div>
+        <!-- BUSINESS -->
+        <div class="pcard">
+          <div class="ptier">Business</div>
+          <div class="pwho">For growing event teams</div>
+          <div class="pprice"><span data-m="120" data-a="99">$99</span><small>/mo</small></div>
+          <div class="pper" id="per-biz">billed annually</div>
+          <a href="#" class="btn btn-ghost">Start free trial</a>
+          <ul class="pfeats">
+            <li class="lead">Everything in Pro, plus</li>
+            <li><span class="ck">✓</span> Up to 10,000 guests</li>
+            <li><span class="ck">✓</span> Lower fee (1.5% + $0.49)</li>
+            <li><span class="ck">✓</span> Roles, permissions &amp; approvals</li>
+            <li><span class="ck">✓</span> Badge printing &amp; seating</li>
+            <li><span class="ck">✓</span> Integrations &amp; advanced analytics</li>
+          </ul>
+        </div>
+        <!-- ENTERPRISE -->
+        <div class="pcard">
+          <div class="ptier">Enterprise</div>
+          <div class="pwho">For large organizations</div>
+          <div class="pprice">Custom</div>
+          <div class="pper">Tailored annual contract</div>
+          <a href="#" class="btn btn-ghost">Contact sales</a>
+          <ul class="pfeats">
+            <li class="lead">Everything in Business, plus</li>
+            <li><span class="ck">✓</span> Unlimited guests &amp; events</li>
+            <li><span class="ck">✓</span> SSO/SAML, SCIM &amp; SOC 2</li>
+            <li><span class="ck">✓</span> Dedicated CSM &amp; SLA</li>
+            <li><span class="ck">✓</span> API &amp; custom integrations</li>
+            <li><span class="ck">✓</span> Invoicing &amp; PO billing</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="fee-note">Ticketing fees apply only to paid tickets — free events never cost a cent. Nonprofit &amp; education discounts available.</p>
+
+      <!-- COMPARISON CHART -->
+      <div class="compare-wrap">
+        <table class="compare">
+          <thead>
+            <tr>
+              <th>Compare plans</th>
+              <th>Free</th>
+              <th class="pop">Pro</th>
+              <th>Business</th>
+              <th>Enterprise</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="cat"><td colspan="5">Events &amp; guests</td></tr>
+            <tr><td class="label">Events</td><td class="val">Unlimited</td><td class="val">Unlimited</td><td class="val">Unlimited</td><td class="val">Unlimited</td></tr>
+            <tr><td class="label">Guests per event</td><td class="val">250</td><td class="val">2,000</td><td class="val">10,000</td><td class="val">Unlimited</td></tr>
+            <tr><td class="label">Event pages &amp; waitlists</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+
+            <tr class="cat"><td colspan="5">Ticketing &amp; payments</td></tr>
+            <tr><td class="label">Free tickets &amp; RSVPs</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Paid ticketing</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Ticketing fee</td><td class="val">—</td><td class="val">2.5% + $0.99</td><td class="val">1.5% + $0.49</td><td class="val">Custom</td></tr>
+            <tr><td class="label">Promo codes &amp; discounts</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+
+            <tr class="cat"><td colspan="5">Branding</td></tr>
+            <tr><td class="label">Custom branding &amp; logo</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Custom domain</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Remove Convene badge</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+
+            <tr class="cat"><td colspan="5">Team &amp; roles</td></tr>
+            <tr><td class="label">Hosts / seats</td><td class="val">1</td><td class="val">3</td><td class="val">10+</td><td class="val">Unlimited</td></tr>
+            <tr><td class="label">Roles &amp; permissions</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">Advanced</td></tr>
+            <tr><td class="label">Approval workflows</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+
+            <tr class="cat"><td colspan="5">On-site</td></tr>
+            <tr><td class="label">Mobile check-in</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Badge printing</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Seating &amp; capacity</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+
+            <tr class="cat"><td colspan="5">Automation &amp; insights</td></tr>
+            <tr><td class="label">Automated reminders &amp; follow-ups</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Analytics</td><td class="val">Basic</td><td class="val">Standard</td><td class="val">Advanced</td><td class="val">Advanced + exports</td></tr>
+            <tr><td class="label">Integrations</td><td class="no">—</td><td class="val">Core</td><td class="val">Slack, Zoom, Salesforce</td><td class="val">+ custom</td></tr>
+
+            <tr class="cat"><td colspan="5">Security &amp; support</td></tr>
+            <tr><td class="label">Support</td><td class="val">Community</td><td class="val">Email</td><td class="val">Priority</td><td class="val">Dedicated CSM + SLA</td></tr>
+            <tr><td class="label">API access</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">Custom</td></tr>
+            <tr><td class="label">SSO / SAML &amp; SCIM</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+            <tr><td class="label">SOC 2 &amp; advanced security</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+            <tr><td class="label">Invoicing &amp; PO billing</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- SECTION 5: TRY FOR FREE -->
   <section class="block tint">
     <div class="container">
@@ -773,6 +953,23 @@
     });
     document.addEventListener('click', (e) => { if (!e.target.closest('.nav-item[data-mega]')) closeAll(); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
+
+    // pricing billing toggle
+    const sw = document.getElementById('billswitch');
+    if (sw) {
+      const setBilling = (annual) => {
+        sw.classList.toggle('on', annual);
+        document.getElementById('lbl-year').classList.toggle('toggle-active', annual);
+        document.getElementById('lbl-month').classList.toggle('toggle-active', !annual);
+        document.querySelectorAll('.pprice span[data-m]').forEach(s => {
+          s.textContent = '$' + (annual ? s.dataset.a : s.dataset.m);
+        });
+        const per = annual ? 'billed annually' : 'billed monthly';
+        document.getElementById('per-pro').textContent = per;
+        document.getElementById('per-biz').textContent = per;
+      };
+      sw.addEventListener('click', () => setBilling(!sw.classList.contains('on')));
+    }
 
     // rotating hero word — re-query each tick so the reference never goes stale
     const words = ['birthdays', 'meetups', 'summits', 'weddings', 'launches', 'reunions', 'keynotes'];
