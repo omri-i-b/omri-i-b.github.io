@@ -24,7 +24,10 @@
   /* ═══ APP SHELL ═══ */
   .layout{display:flex;min-height:100vh}
   .sidebar{width:236px;flex-shrink:0;background:#131318;border-right:1px solid var(--line);
-    position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:65}
+    position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:65;
+    transition:margin-left .28s cubic-bezier(.4,0,.2,1),opacity .2s}
+  /* Preview = clean guest view, no admin nav */
+  body.mode-preview .sidebar{margin-left:-236px;opacity:0;pointer-events:none}
   .sb-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
   .sb-brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px}
   .sb-brand .m{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#6846f0);display:flex;align-items:center;justify-content:center}
