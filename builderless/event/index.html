@@ -112,9 +112,9 @@
   .bc-drag:hover{color:var(--ink)}
   .bc-ic{width:22px;height:22px;border-radius:6px;background:var(--panel-3);display:flex;align-items:center;justify-content:center;color:var(--muted)}
   .bc-ic svg{width:12px;height:12px}
-  .bc-name{font-weight:600}
+  .bc-name{font-weight:600;white-space:nowrap}
   .bc-stat{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green);
-    background:var(--green-t);padding:2px 8px;border-radius:20px}
+    background:var(--green-t);padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
   .bc-stat.neutral{color:var(--muted);background:var(--panel-3)}
   .bc-spacer{flex:1}
   .bc-actions{display:flex;gap:2px}
@@ -171,7 +171,13 @@
   body.mode-edit .wcol:hover .card{border-color:var(--line-2)}
   body.mode-edit .wcol.selected .block-chrome{border-color:var(--accent);background:var(--accent-soft)}
   body.mode-edit .wcol.selected .card{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-  .wcol .block-chrome{border-radius:12px 12px 0 0}
+  .wcol .block-chrome{border-radius:12px 12px 0 0;padding:0 4px 0 8px;gap:6px}
+  .wcol .bc-drag{font-size:12px}
+  .wcol .bc-stat{font-size:10px;padding:2px 6px}
+  /* chrome bar is the header in edit mode — hide the widget's own repeated heading */
+  body.mode-edit .wcol .c-head,body.mode-edit .wcol .c-sub{display:none}
+  body.mode-edit .wcol .gl,body.mode-edit .wcol .sch{padding-top:13px}
+  body.mode-edit .wcol .map{margin-top:13px}
   .c-head{padding:13px 15px 0;font-size:13px;font-weight:600}
   .c-sub{padding:2px 15px 0;font-size:11px;color:var(--muted)}
   .gl{padding:12px 12px 14px;display:flex;flex-direction:column;gap:7px}
@@ -415,6 +421,7 @@
           <span class="bc-drag">⠿⠿</span>
           <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
           <span class="bc-name">Guestlist</span>
+          <span class="bc-stat">142 going</span>
           <span class="bc-spacer"></span>
           <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('guests')" title="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Guestlist removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></span>
         </div>
@@ -436,6 +443,7 @@
           <span class="bc-drag">⠿⠿</span>
           <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
           <span class="bc-name">Location</span>
+          <span class="bc-stat neutral">Naples, FL</span>
           <span class="bc-spacer"></span>
           <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('location')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Location removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></span>
         </div>
@@ -451,6 +459,7 @@
           <span class="bc-drag">⠿⠿</span>
           <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
           <span class="bc-name">Schedule</span>
+          <span class="bc-stat neutral">5 items</span>
           <span class="bc-spacer"></span>
           <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('schedule')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Schedule removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2L8 22a2 2 0 01-2-2L5 6"/></svg></button></span>
         </div>
