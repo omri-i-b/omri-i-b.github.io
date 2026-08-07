@@ -72,17 +72,6 @@
   .btn svg{width:14px;height:14px}
   .btn-sm{padding:6px 11px;font-size:12px}
 
-  /* ═══ DASHBOARD METRICS STRIP (edit only) ═══ */
-  #dashStrip{max-height:0;overflow:hidden;opacity:0;transition:max-height .3s,opacity .3s;border-bottom:1px solid transparent}
-  body.mode-edit #dashStrip{max-height:90px;opacity:1;border-bottom-color:var(--line);background:rgba(24,24,32,0.5)}
-  .ds-inner{max-width:1180px;margin:0 auto;padding:14px 24px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-  .ds-metric{display:flex;flex-direction:column;gap:2px}
-  .ds-lbl{font-size:11px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:5px}
-  .ds-lbl svg{width:12px;height:12px}
-  .ds-val{font-size:20px;font-weight:800;letter-spacing:-0.01em}
-  .ds-val .sub{font-size:12px;font-weight:600;color:var(--muted);margin-left:4px}
-  .ds-val.up{color:#4fd08a}
-
   /* ═══ CANVAS ═══ */
   .hero-bg{position:absolute;inset:0;height:520px;background:
       linear-gradient(180deg,rgba(14,14,19,0.55) 0%,rgba(14,14,19,0.85) 55%,var(--bg) 100%),
@@ -358,15 +347,6 @@
       <button class="btn btn-primary" onclick="toast('Published ✓')">Publish</button>
     </div>
   </div>
-
-  <!-- ═══ DASHBOARD METRICS (edit only) ═══ -->
-  <div id="dashStrip"><div class="ds-inner">
-    <div class="ds-metric"><span class="ds-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Going</span><span class="ds-val up">142<span class="sub">/ 200</span></span></div>
-    <div class="ds-metric"><span class="ds-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Pending</span><span class="ds-val">18</span></div>
-    <div class="ds-metric"><span class="ds-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Revenue</span><span class="ds-val">$4,260</span></div>
-    <div class="ds-metric"><span class="ds-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Page views</span><span class="ds-val">1,204</span></div>
-    <div class="ds-metric"><span class="ds-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Starts in</span><span class="ds-val">23<span class="sub">days</span></span></div>
-  </div></div>
 
   <!-- ═══ EVENT PAGE ═══ -->
   <div class="hero-bg"></div>
