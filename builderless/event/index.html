@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builderless · Event Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --accent:#6846f0; --accent-hover:#5a3ce0;
+    --bg:#0f0f14; --panel:#1a1a21; --panel-2:#20202a; --line:#2a2a34;
+    --ink:#f4f4f6; --muted:#9a9aa6; --muted-2:#6d6d78;
+    --green:#2f9e63; --edit:#f0a836;
+    --font:'Inter',system-ui,-apple-system,sans-serif;
+    --radius:16px;
+  }
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  body{min-height:100vh}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .muted{color:var(--muted)}
+
+  /* ═══ ORGANIZER TOOLBAR ═══ */
+  .toolbar{position:sticky;top:0;z-index:60;height:56px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;background:rgba(15,15,20,0.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+  .tb-logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#6846f0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+  .tb-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tb-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);text-transform:uppercase;letter-spacing:0.04em}
+  .tb-right{display:flex;align-items:center;gap:10px}
+
+  /* Mode segmented toggle */
+  .seg{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px;transition:all .15s}
+  .seg button.active{background:var(--ink);color:#111}
+  .seg button svg{width:14px;height:14px}
+
+  .btn{padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .btn:hover{background:#2a2a34}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-hover)}
+  .btn svg{width:14px;height:14px}
+
+  /* Edit-mode banner */
+  #editBanner{display:none;align-items:center;justify-content:center;gap:8px;height:34px;background:rgba(240,168,54,0.12);border-bottom:1px solid rgba(240,168,54,0.25);color:var(--edit);font-size:12.5px;font-weight:500}
+  body.mode-edit #editBanner{display:flex}
+
+  /* ═══ EVENT PAGE CANVAS ═══ */
+  .hero-bg{position:absolute;inset:0;height:520px;background:
+      linear-gradient(180deg,rgba(15,15,20,0.55) 0%,rgba(15,15,20,0.85) 55%,var(--bg) 100%),
+      linear-gradient(120deg,#2c4a2f,#1e3a3f 55%,#20202a);
+    z-index:0}
+  .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 20px 120px}
+
+  /* Guest invite bar */
+  .invite-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 22px;
+    padding:10px 12px 10px 16px;background:rgba(26,26,33,0.7);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(8px)}
+  .invite-bar .who{display:flex;align-items:center;gap:9px;font-size:13.5px}
+  .invite-bar .dot{width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .invite-bar .dot svg{width:11px;height:11px}
+  .invite-actions{display:flex;gap:8px}
+
+  /* Hero */
+  .hero{display:flex;gap:24px;align-items:flex-start;margin-bottom:30px}
+  .hero-logo{width:150px;height:150px;border-radius:14px;flex-shrink:0;overflow:hidden;position:relative;
+    background:radial-gradient(circle at 40% 35%,#3a3a42,#222 70%);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center}
+  .hero-shield{width:96px;height:110px;background:linear-gradient(160deg,#1f7a4d,#0e5a37);border-radius:12px 12px 40% 40%/12px 12px 30% 30%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.4);border:2px solid #f2c94c}
+  .hero-shield .top{font-size:9px;font-weight:800;color:#f2c94c;letter-spacing:1px}
+  .hero-shield .mid{font-size:15px;font-weight:800;color:#fff;font-style:italic;line-height:1;text-align:center;margin-top:2px}
+  .hero-shield .sub{font-size:11px;font-weight:700;color:#f2c94c;font-style:italic}
+  .hero-body{flex:1;min-width:0;padding-top:4px}
+  .hero-title{font-size:30px;font-weight:800;letter-spacing:-0.02em;line-height:1.1}
+  .hero-desc{margin-top:12px;font-size:14.5px;line-height:1.6;color:#c9c9d2;max-width:560px}
+  .hero-desc p+p{margin-top:12px}
+  .hero-meta{display:flex;gap:28px;margin-top:18px;flex-wrap:wrap}
+  .meta{display:flex;gap:9px;align-items:flex-start}
+  .meta svg{width:16px;height:16px;color:var(--muted);flex-shrink:0;margin-top:2px}
+  .meta .l1{font-size:13.5px;font-weight:600}
+  .meta .l2{font-size:12.5px;color:var(--muted)}
+
+  /* Cards row */
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+  .widget{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:border-color .15s}
+  .w-head{padding:13px 15px 0;font-size:13px;font-weight:600}
+  .w-sub{padding:2px 15px 0;font-size:11px;color:var(--muted)}
+
+  /* Guestlist */
+  .gl{padding:12px 12px 14px;display:flex;flex-direction:column;gap:7px}
+  .gl-row{display:flex;align-items:center;gap:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:7px 11px}
+  .gl-av{width:22px;height:22px;border-radius:50%;flex-shrink:0}
+  .gl-name{font-size:12.5px;font-weight:500}
+
+  /* Map */
+  .map{height:170px;margin:11px 15px 15px;border-radius:12px;background:
+      repeating-linear-gradient(45deg,#243b52,#243b52 12px,#22374c 12px,#22374c 24px),
+      linear-gradient(135deg,#2b5c4a,#1e3a52);position:relative;overflow:hidden;border:1px solid var(--line)}
+  .map .pin{position:absolute;top:44%;left:52%;width:24px;height:24px;border-radius:50%;background:var(--green);border:3px solid #fff;transform:translate(-50%,-50%);box-shadow:0 3px 8px rgba(0,0,0,.4)}
+
+  /* Schedule */
+  .sch{padding:11px 12px 13px;display:flex;flex-direction:column;gap:6px}
+  .sch-row{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+  .sch-row.dim{opacity:.5}
+  .sch-t{font-size:12.5px;font-weight:600}
+  .sch-time{font-size:11px;color:var(--muted);margin-top:1px}
+
+  /* Gallery */
+  .gallery{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+  .gallery.widget{background:transparent;border:none;overflow:visible}
+  .gal-img{height:230px;border-radius:var(--radius);border:1px solid var(--line);background-size:cover;background-position:center}
+  .gal-1{background:linear-gradient(135deg,#3f6d3f,#5c8a4a),repeating-linear-gradient(90deg,#4a7a4a,#4a7a4a 40px,#457045 40px,#457045 80px)}
+  .gal-2{background:linear-gradient(135deg,#8a7a5c,#a89268)}
+  .gal-3{background:linear-gradient(135deg,#7a9a5c,#9ab06a)}
+
+  /* FAQ */
+  .faq.widget{background:transparent;border:none;overflow:visible;padding-top:6px}
+  .faq h3{font-size:19px;font-weight:700;margin-bottom:16px}
+  .faq-item{margin-bottom:16px;max-width:560px}
+  .faq-q{font-size:14px;font-weight:600}
+  .faq-a{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.55}
+
+  /* Bottom map card */
+  .loc-card{margin-top:6px}
+
+  /* ═══ PREVIEW-MODE DASHBOARD AFFORDANCE ═══ */
+  .w-manage{position:absolute;top:10px;right:10px;z-index:5;display:none;align-items:center;gap:6px;
+    padding:5px 10px;border-radius:20px;background:rgba(15,15,20,0.9);border:1px solid var(--line);
+    font-size:11.5px;font-weight:600;color:var(--ink);backdrop-filter:blur(6px);white-space:nowrap}
+  .w-manage svg{width:12px;height:12px;color:var(--accent)}
+  body.mode-preview .widget:hover .w-manage{display:flex}
+  body.mode-preview .widget[data-manage]:hover{border-color:var(--accent);cursor:pointer}
+  /* live stat pill sits inline in preview */
+  .w-stat{display:none;font-size:11px;font-weight:600;color:var(--green);margin-left:6px}
+  body.mode-preview .w-stat{display:inline}
+
+  /* ═══ EDIT-MODE AFFORDANCE ═══ */
+  body.mode-edit .widget[data-edit]{cursor:default}
+  body.mode-edit .widget[data-edit]:hover,
+  body.mode-edit .editable:hover{outline:2px dashed rgba(240,168,54,0.6);outline-offset:3px;border-radius:8px}
+  .w-tools{position:absolute;top:8px;right:8px;z-index:6;display:none;gap:4px}
+  body.mode-edit .widget[data-edit]:hover .w-tools{display:flex}
+  .w-tool{width:26px;height:26px;border-radius:7px;background:rgba(15,15,20,0.92);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .w-tool:hover{color:var(--ink);border-color:var(--edit)}
+  .w-tool svg{width:13px;height:13px}
+  body.mode-edit .add-block{display:flex}
+  .add-block{display:none;align-items:center;justify-content:center;gap:8px;margin:14px 0;padding:14px;
+    border:1.5px dashed var(--line);border-radius:14px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+  .add-block:hover{border-color:var(--accent);color:var(--ink)}
+  .add-block svg{width:15px;height:15px}
+  body.mode-edit [contenteditable]{outline:none}
+  body.mode-edit [contenteditable]:focus{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+  body.mode-edit .editable{cursor:text}
+  /* Make editable text obvious in edit mode: faint tint + pencil on hover */
+  body.mode-edit .editable{position:relative;border-radius:6px;transition:background .12s}
+  body.mode-edit .editable:hover{background:rgba(240,168,54,0.08);outline:none}
+  body.mode-edit .editable:hover::after{content:'✎';position:absolute;top:-8px;right:-8px;width:18px;height:18px;
+    background:var(--edit);color:#111;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;font-style:normal}
+  /* "Edit event details" affordance on the hero block */
+  .details-hint{display:none;align-items:center;gap:6px;margin-bottom:10px;padding:6px 11px;border-radius:8px;
+    background:rgba(240,168,54,0.12);border:1px solid rgba(240,168,54,0.3);color:var(--edit);font-size:12px;font-weight:600;width:fit-content}
+  .details-hint svg{width:13px;height:13px}
+  body.mode-edit .details-hint{display:inline-flex}
+
+  /* Manage drawer */
+  #drawerScrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none}
+  #drawer{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);
+    z-index:81;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+  #drawer.open{transform:translateX(0)}
+  .dr-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .dr-title{font-size:16px;font-weight:700}
+  .dr-body{flex:1;overflow-y:auto;padding:16px 18px}
+  .dr-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .dr-close:hover{background:var(--panel-2)}
+  .dr-stat-row{display:flex;gap:10px;margin-bottom:16px}
+  .dr-stat{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .dr-stat .n{font-size:22px;font-weight:800}
+  .dr-stat .l{font-size:11px;color:var(--muted);margin-top:2px}
+  .dr-guest{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .dr-guest .gl-av{width:30px;height:30px}
+  .dr-guest .info{flex:1}
+  .dr-guest .nm{font-size:13.5px;font-weight:500}
+  .dr-guest .em{font-size:11.5px;color:var(--muted)}
+  .dr-tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px}
+  .tag-yes{background:rgba(47,158,99,0.15);color:#4fd08a}
+  .tag-pending{background:var(--panel-2);color:var(--muted)}
+
+  /* ═══ FLOATING FAST-ACTIONS TOOLBAR (edit mode) ═══ */
+  #fabBar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);z-index:70;
+    display:flex;align-items:center;gap:6px;padding:7px;background:rgba(26,26,33,0.92);border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);backdrop-filter:blur(16px);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+  body.mode-edit #fabBar{transform:translateX(-50%) translateY(0)}
+  .fab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:11px;
+    color:var(--muted);font-size:10.5px;font-weight:600;transition:all .13s;min-width:56px}
+  .fab:hover{background:var(--panel-2);color:var(--ink)}
+  .fab svg{width:18px;height:18px}
+  .fab-div{width:1px;height:30px;background:var(--line);margin:0 2px}
+  .fab-add{background:var(--accent);color:#fff;flex-direction:row;gap:6px;padding:11px 16px;border-radius:12px;font-size:13px}
+  .fab-add:hover{background:var(--accent-hover);color:#fff}
+  .fab-add svg{width:16px;height:16px}
+
+  /* Add-section popover */
+  #addMenu{position:fixed;bottom:92px;left:50%;transform:translateX(-50%) translateY(10px);z-index:71;
+    width:340px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.55);
+    padding:8px;opacity:0;pointer-events:none;transition:all .18s}
+  #addMenu.open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+  .am-title{font-size:11px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 6px}
+  .am-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .12s}
+  .am-item:hover{background:var(--panel-2)}
+  .am-ic{width:32px;height:32px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0}
+  .am-ic svg{width:15px;height:15px}
+  .am-txt{flex:1;min-width:0}
+  .am-name{font-size:13.5px;font-weight:600}
+  .am-desc{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .am-added{font-size:10.5px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:3px}
+  .am-added svg{width:12px;height:12px}
+  .am-plus{color:var(--accent);font-size:18px;font-weight:400}
+
+  /* Toast */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--ink);color:#111;font-size:13px;font-weight:600;padding:10px 18px;border-radius:10px;z-index:90;
+    transition:all .2s;pointer-events:none}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:760px){
+    .hero{flex-direction:column}.cards{grid-template-columns:1fr}
+    .hero-title{font-size:24px}
+  }
+</style>
+</head>
+<body class="mode-preview">
+
+  <!-- ═══ ORGANIZER TOOLBAR ═══ -->
+  <div class="toolbar">
+    <div class="tb-left">
+      <div class="tb-logo">B</div>
+      <span class="tb-name">X-CUP Winter Golf Scramble</span>
+      <span class="tb-badge">Live</span>
+    </div>
+    <div class="seg">
+      <button id="segPreview" class="active" onclick="setMode('preview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </button>
+      <button id="segEdit" onclick="setMode('edit')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+    </div>
+    <div class="tb-right">
+      <button class="btn" onclick="toast('Link copied')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Share</button>
+      <button class="btn btn-primary" onclick="toast('Published ✓')">Publish</button>
+    </div>
+  </div>
+
+  <div id="editBanner">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Edit mode — click any text to change it, hover a section for controls
+  </div>
+
+  <!-- ═══ EVENT PAGE ═══ -->
+  <div class="hero-bg"></div>
+  <div class="page">
+
+    <!-- Guest invite bar (what guests see) -->
+    <div class="invite-bar">
+      <div class="who">
+        <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span>You've been invited by <strong>Daniel Hendricks</strong>!</span>
+      </div>
+      <div class="invite-actions">
+        <button class="btn btn-primary">Accept Invite</button>
+        <button class="btn">Decline</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-logo widget" data-edit>
+        <div class="w-tools"><button class="w-tool" title="Replace image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M3 16l5-5 4 4 4-5 5 5"/></svg></button></div>
+        <div class="hero-shield"><span class="top">X-CUP</span><span class="mid">St Patty's</span><span class="sub">Scramble</span></div>
+      </div>
+      <div class="hero-body">
+        <div class="details-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit event details — title, date, time, location are all editable
+        </div>
+        <h1 class="hero-title editable" contenteditable="false">X-CUP Winter Golf Scramble</h1>
+        <div class="hero-desc editable" contenteditable="false">
+          <p>Bundle up and tee off! Join us for our annual Winter Golf Scramble, a 4-person best-ball format where the cold is the only real competition. Expect frosty fairways, hot cocoa at the turn, and plenty of mulligans to go around.</p>
+          <p>Check the details below for tee times, team sign-ups, and what to wear so you don't freeze mid-swing. Spots fill fast, so register early!</p>
+        </div>
+        <div class="hero-meta">
+          <div class="meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <div><div class="l1 editable" contenteditable="false">March 15, 2026</div><div class="l2 editable" contenteditable="false">6:00 PM – 8:30 PM</div></div>
+          </div>
+          <div class="meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div><div class="l1 editable" contenteditable="false">Tiburón Golf Club</div><div class="l2 editable" contenteditable="false">2620 Tiburon Dr, Naples, FL 34109</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards row -->
+    <div class="cards">
+      <!-- Guestlist -->
+      <div class="widget" data-edit data-manage="guests" onclick="widgetClick(this)">
+        <div class="w-tools"><button class="w-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Manage guests →</div>
+        <div class="w-head">Guestlist <span class="w-stat">· 142 going</span></div>
+        <div class="gl">
+          <div class="gl-row"><span class="gl-av" style="background:#e08a6b"></span><span class="gl-name">Davey Crockett</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#6ba3e0"></span><span class="gl-name">Jamie Davidson</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#8a6be0"></span><span class="gl-name">Katie Simmons</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#e0c86b"></span><span class="gl-name">Kammy Short</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#6be0a3"></span><span class="gl-name">Mike Wazowski</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#e06b9a"></span><span class="gl-name">Jessica Evans</span></div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="widget" data-edit data-manage="location" onclick="widgetClick(this)">
+        <div class="w-tools"><button class="w-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Edit location →</div>
+        <div class="w-head editable" contenteditable="false">Tiburón Golf Club</div>
+        <div class="w-sub editable" contenteditable="false">2620 Tiburon Dr, Naples, FL 34109</div>
+        <div class="map"><div class="pin"></div></div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="widget" data-edit data-manage="schedule" onclick="widgetClick(this)">
+        <div class="w-tools"><button class="w-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Edit schedule →</div>
+        <div class="w-head">Schedule</div>
+        <div class="sch">
+          <div class="sch-row"><div class="sch-t">Welcome</div><div class="sch-time">7:45 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Breakfast</div><div class="sch-time">8:00 – 9:15 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Shotgun Start</div><div class="sch-time">9:30 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Lunch at The Turn</div><div class="sch-time">12:00 – 12:30 PM</div></div>
+          <div class="sch-row dim"><div class="sch-t">Awards & Drinks</div><div class="sch-time">3:00 PM</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photo gallery -->
+    <div class="gallery widget" data-edit data-manage="photos" onclick="widgetClick(this)">
+      <div class="w-tools"><button class="w-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+      <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M3 16l5-5 4 4 4-5 5 5"/></svg> Manage photos →</div>
+      <div class="gal-img gal-1"></div>
+      <div class="gal-img gal-2"></div>
+      <div class="gal-img gal-3"></div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq widget" data-edit data-manage="faq" onclick="widgetClick(this)">
+      <div class="w-tools"><button class="w-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+      <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Edit FAQ →</div>
+      <h3 class="editable" contenteditable="false">Frequently Asked Questions</h3>
+      <div class="faq-item"><div class="faq-q editable" contenteditable="false">What about equipment?</div><div class="faq-a editable" contenteditable="false">Rentals are available at the pro shop, but bring your own clubs if you've got 'em. Carts are included for every foursome.</div></div>
+      <div class="faq-item"><div class="faq-q editable" contenteditable="false">What about food arrangements?</div><div class="faq-a editable" contenteditable="false">Breakfast before the shotgun start and lunch at the turn are included. Let us know dietary needs when you register.</div></div>
+      <div class="faq-item"><div class="faq-q editable" contenteditable="false">What about the weather?</div><div class="faq-a editable" contenteditable="false">We play rain or shine (it's the Winter Scramble, after all). Dress in layers and bring a windbreaker.</div></div>
+    </div>
+
+  </div>
+
+  <!-- Manage drawer -->
+  <div id="drawerScrim" onclick="closeDrawer()"></div>
+  <aside id="drawer">
+    <div class="dr-head">
+      <div class="dr-title" id="drTitle">Manage</div>
+      <button class="dr-close" onclick="closeDrawer()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="dr-body" id="drBody"></div>
+  </aside>
+
+  <!-- Add-section popover -->
+  <div id="addMenu">
+    <div class="am-title">Add a section</div>
+    <div class="am-item" onclick="addSection('Photo gallery')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M3 16l5-5 4 4 4-5 5 5"/></svg></div><div class="am-txt"><div class="am-name">Photo gallery</div><div class="am-desc">Show off the venue or past events</div></div><span class="am-added"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Added</span></div>
+    <div class="am-item" onclick="addSection('Schedule')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="am-txt"><div class="am-name">Schedule</div><div class="am-desc">Agenda / timeline of the day</div></div><span class="am-added"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Added</span></div>
+    <div class="am-item" onclick="addSection('FAQ')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="am-txt"><div class="am-name">FAQ</div><div class="am-desc">Answer common questions</div></div><span class="am-added"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Added</span></div>
+    <div class="am-item" onclick="addSection('Sponsors')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><div class="am-txt"><div class="am-name">Sponsors</div><div class="am-desc">Logos of partners &amp; sponsors</div></div><span class="am-plus">+</span></div>
+    <div class="am-item" onclick="addSection('Speakers')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="am-txt"><div class="am-name">Speakers</div><div class="am-desc">Feature hosts, DJs, or presenters</div></div><span class="am-plus">+</span></div>
+    <div class="am-item" onclick="addSection('Text block')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></div><div class="am-txt"><div class="am-name">Text block</div><div class="am-desc">Freeform rich text</div></div><span class="am-plus">+</span></div>
+    <div class="am-item" onclick="addSection('Countdown')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6M22 6l-3-3"/></svg></div><div class="am-txt"><div class="am-name">Countdown</div><div class="am-desc">Ticking timer to the event</div></div><span class="am-plus">+</span></div>
+  </div>
+
+  <!-- Floating fast-actions toolbar -->
+  <div id="fabBar">
+    <button class="fab" onclick="openDrawer('guests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Guests</button>
+    <button class="fab" onclick="toast('Registration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 013-3h14a3 3 0 013 3 3 3 0 010 6 3 3 0 010 6H5a3 3 0 010-6 3 3 0 010-6z"/></svg>Register</button>
+    <button class="fab" onclick="toast('Communications')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Message</button>
+    <button class="fab" onclick="toast('Settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+    <div class="fab-div"></div>
+    <button class="fab fab-add" onclick="toggleAddMenu(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add section</button>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  function setMode(m){
+    document.body.classList.toggle('mode-edit', m==='edit');
+    document.body.classList.toggle('mode-preview', m==='preview');
+    document.getElementById('segEdit').classList.toggle('active', m==='edit');
+    document.getElementById('segPreview').classList.toggle('active', m==='preview');
+    // toggle contenteditable on all editable fields
+    document.querySelectorAll('.editable').forEach(function(el){
+      el.setAttribute('contenteditable', m==='edit' ? 'true' : 'false');
+    });
+  }
+
+  var toastTimer;
+  function toast(msg){
+    var t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show')},1600);
+  }
+
+  // In preview mode, clicking a widget opens its management drawer.
+  function widgetClick(el){
+    if(document.body.classList.contains('mode-edit')) return; // edit handled inline
+    var kind = el.getAttribute('data-manage');
+    openDrawer(kind);
+  }
+
+  var DRAWERS = {
+    guests: {title:'Guests', body:
+      '<div class="dr-stat-row">'+
+        '<div class="dr-stat"><div class="n" style="color:var(--accent)">142</div><div class="l">Going</div></div>'+
+        '<div class="dr-stat"><div class="n">18</div><div class="l">Pending</div></div>'+
+        '<div class="dr-stat"><div class="n">4</div><div class="l">Declined</div></div>'+
+      '</div>'+
+      guestRow('Davey Crockett','davey@example.com','#e08a6b','yes')+
+      guestRow('Jamie Davidson','jamie@example.com','#6ba3e0','yes')+
+      guestRow('Katie Simmons','katie@example.com','#8a6be0','yes')+
+      guestRow('Kammy Short','kammy@example.com','#e0c86b','pending')+
+      guestRow('Mike Wazowski','mike@example.com','#6be0a3','yes')+
+      guestRow('Jessica Evans','jessica@example.com','#e06b9a','pending')+
+      '<button class="btn" style="width:100%;justify-content:center;margin-top:14px">Open full guest list →</button>'
+    },
+    schedule:{title:'Schedule', body:
+      '<p class="muted" style="font-size:13px;margin-bottom:14px">5 items · shown on the event page</p>'+
+      schedRow('Welcome','7:45 AM')+schedRow('Breakfast','8:00 – 9:15 AM')+schedRow('Shotgun Start','9:30 AM')+
+      schedRow('Lunch at The Turn','12:00 – 12:30 PM')+schedRow('Awards & Drinks','3:00 PM')+
+      '<button class="btn" style="width:100%;justify-content:center;margin-top:12px">+ Add schedule item</button>'
+    },
+    photos:{title:'Photos', body:
+      '<p class="muted" style="font-size:13px;margin-bottom:14px">3 photos in the gallery</p>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+        '<div class="gal-img gal-1" style="height:90px;border-radius:10px"></div>'+
+        '<div class="gal-img gal-2" style="height:90px;border-radius:10px"></div>'+
+        '<div class="gal-img gal-3" style="height:90px;border-radius:10px"></div>'+
+        '<div style="height:90px;border-radius:10px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer">+ Upload</div>'+
+      '</div>'
+    },
+    faq:{title:'FAQ', body:
+      '<p class="muted" style="font-size:13px;margin-bottom:14px">3 questions</p>'+
+      faqRow('What about equipment?')+faqRow('What about food arrangements?')+faqRow('What about the weather?')+
+      '<button class="btn" style="width:100%;justify-content:center;margin-top:12px">+ Add question</button>'
+    },
+    location:{title:'Location', body:
+      '<div class="map" style="height:180px;margin:0 0 14px"><div class="pin"></div></div>'+
+      '<div style="font-weight:600;font-size:14px">Tiburón Golf Club</div>'+
+      '<div class="muted" style="font-size:13px;margin-top:2px">2620 Tiburon Dr, Naples, FL 34109</div>'+
+      '<button class="btn" style="width:100%;justify-content:center;margin-top:16px">Change location</button>'
+    }
+  };
+  function guestRow(n,e,c,s){
+    return '<div class="dr-guest"><span class="gl-av" style="background:'+c+'"></span>'+
+      '<div class="info"><div class="nm">'+n+'</div><div class="em">'+e+'</div></div>'+
+      '<span class="dr-tag '+(s==='yes'?'tag-yes':'tag-pending')+'">'+(s==='yes'?'Going':'Pending')+'</span></div>';
+  }
+  function schedRow(t,tm){return '<div class="dr-guest"><div class="info"><div class="nm">'+t+'</div><div class="em">'+tm+'</div></div><span class="muted" style="font-size:16px;cursor:grab">⋮⋮</span></div>';}
+  function faqRow(q){return '<div class="dr-guest"><div class="info"><div class="nm">'+q+'</div></div><span class="muted" style="font-size:16px;cursor:grab">⋮⋮</span></div>';}
+
+  function toggleAddMenu(e){
+    if(e) e.stopPropagation();
+    document.getElementById('addMenu').classList.toggle('open');
+  }
+  function addSection(name){
+    document.getElementById('addMenu').classList.remove('open');
+    toast(name + ' added to your page');
+  }
+  document.addEventListener('click', function(e){
+    var m=document.getElementById('addMenu');
+    if(m.classList.contains('open') && !m.contains(e.target) && !e.target.closest('.fab-add')) m.classList.remove('open');
+  });
+
+  function openDrawer(kind){
+    var d=DRAWERS[kind]; if(!d) return;
+    document.getElementById('drTitle').textContent=d.title;
+    document.getElementById('drBody').innerHTML=d.body;
+    document.getElementById('drawerScrim').style.display='block';
+    document.getElementById('drawer').classList.add('open');
+  }
+  function closeDrawer(){
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerScrim').style.display='none';
+  }
+</script>
+</body>
+</html>
