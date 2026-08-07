@@ -162,16 +162,16 @@
 
   /* Cards row inside a block */
   .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
-  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:box-shadow .15s}
-  /* each widget is independently selectable in edit mode */
-  body.mode-edit .card{cursor:pointer}
-  body.mode-edit .card:hover{box-shadow:0 0 0 1px var(--line-2)}
-  body.mode-edit .card.selected{box-shadow:0 0 0 2px var(--accent)}
-  .w-gear{position:absolute;top:9px;right:9px;z-index:6;display:none;width:28px;height:28px;border-radius:8px;
-    align-items:center;justify-content:center;background:rgba(14,14,19,0.92);border:1px solid var(--line-2);color:var(--muted)}
-  .w-gear:hover{color:var(--ink);border-color:var(--accent)}
-  .w-gear svg{width:14px;height:14px}
-  body.mode-edit .card:hover .w-gear,body.mode-edit .card.selected .w-gear{display:flex}
+  .wcol{position:relative}
+  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:box-shadow .15s,border-color .15s}
+  /* each widget's chrome bar connects to its card in edit mode */
+  body.mode-edit .wcol{cursor:pointer}
+  body.mode-edit .wcol .card{border-top-left-radius:0;border-top-right-radius:0}
+  body.mode-edit .wcol:hover .block-chrome{border-color:var(--line-2)}
+  body.mode-edit .wcol:hover .card{border-color:var(--line-2)}
+  body.mode-edit .wcol.selected .block-chrome{border-color:var(--accent);background:var(--accent-soft)}
+  body.mode-edit .wcol.selected .card{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .wcol .block-chrome{border-radius:12px 12px 0 0}
   .c-head{padding:13px 15px 0;font-size:13px;font-weight:600}
   .c-sub{padding:2px 15px 0;font-size:11px;color:var(--muted)}
   .gl{padding:12px 12px 14px;display:flex;flex-direction:column;gap:7px}
@@ -204,10 +204,13 @@
     padding:5px 10px;border-radius:20px;background:rgba(14,14,19,0.92);border:1px solid var(--line);
     font-size:11.5px;font-weight:600;color:var(--ink);backdrop-filter:blur(6px);white-space:nowrap}
   .w-manage svg{width:12px;height:12px;color:var(--accent)}
-  body.mode-preview .block[data-manage]:hover .w-manage{display:flex}
+  body.mode-preview .block[data-manage]:hover .w-manage,
+  body.mode-preview .wcol[data-manage]:hover .w-manage{display:flex}
   body.mode-preview .block[data-manage]:hover .block-body,
-  body.mode-preview .block[data-manage]:hover .card{cursor:pointer}
+  body.mode-preview .block[data-manage]:hover .card,
+  body.mode-preview .wcol[data-manage]:hover .card{cursor:pointer}
   body.mode-preview .block[data-manage]:hover{box-shadow:0 0 0 1px var(--accent),0 10px 30px rgba(104,70,240,0.15)}
+  body.mode-preview .wcol[data-manage]:hover .card{box-shadow:0 0 0 1px var(--accent),0 10px 30px rgba(104,70,240,0.15)}
   .w-stat{display:none;font-size:11px;font-weight:600;color:var(--green);margin-left:6px}
   body.mode-preview .w-stat{display:inline}
 
@@ -404,38 +407,62 @@
 
     <div class="ins" onclick="insAdd()"></div>
 
-    <!-- ═══ Widgets row — each is its own selectable widget ═══ -->
+    <!-- ═══ Widgets row — each is its own block with its own chrome ═══ -->
     <div class="cards">
       <!-- guestlist -->
-      <div class="card" data-block="guestlist" data-manage="guests" onclick="cardClick(this,'guestlist',event)">
-        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'guestlist')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
-        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage guests →</div>
-        <div class="c-head">Guestlist <span class="w-stat">· 142 going</span></div>
-        <div class="gl">
-          <div class="gl-row"><span class="gl-av" style="background:#e08a6b"></span><span class="gl-name">Davey Crockett</span></div>
-          <div class="gl-row"><span class="gl-av" style="background:#6ba3e0"></span><span class="gl-name">Jamie Davidson</span></div>
-          <div class="gl-row"><span class="gl-av" style="background:#8a6be0"></span><span class="gl-name">Katie Simmons</span></div>
-          <div class="gl-row"><span class="gl-av" style="background:#e0c86b"></span><span class="gl-name">Kammy Short</span></div>
-          <div class="gl-row"><span class="gl-av" style="background:#6be0a3"></span><span class="gl-name">Mike Wazowski</span></div>
+      <div class="wcol" data-block="guestlist" data-manage="guests" onclick="cardClick(this,'guestlist',event)">
+        <div class="block-chrome">
+          <span class="bc-drag">⠿⠿</span>
+          <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+          <span class="bc-name">Guestlist</span>
+          <span class="bc-spacer"></span>
+          <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('guests')" title="Manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Guestlist removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></span>
+        </div>
+        <div class="card">
+          <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage guests →</div>
+          <div class="c-head">Guestlist <span class="w-stat">· 142 going</span></div>
+          <div class="gl">
+            <div class="gl-row"><span class="gl-av" style="background:#e08a6b"></span><span class="gl-name">Davey Crockett</span></div>
+            <div class="gl-row"><span class="gl-av" style="background:#6ba3e0"></span><span class="gl-name">Jamie Davidson</span></div>
+            <div class="gl-row"><span class="gl-av" style="background:#8a6be0"></span><span class="gl-name">Katie Simmons</span></div>
+            <div class="gl-row"><span class="gl-av" style="background:#e0c86b"></span><span class="gl-name">Kammy Short</span></div>
+            <div class="gl-row"><span class="gl-av" style="background:#6be0a3"></span><span class="gl-name">Mike Wazowski</span></div>
+          </div>
         </div>
       </div>
       <!-- map -->
-      <div class="card" data-block="location" data-manage="location" onclick="cardClick(this,'location',event)">
-        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'location')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
-        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Edit location →</div>
-        <div class="c-head">Tiburón Golf Club</div><div class="c-sub">2620 Tiburon Dr, Naples, FL 34109</div>
-        <div class="map"><div class="pin"></div></div>
+      <div class="wcol" data-block="location" data-manage="location" onclick="cardClick(this,'location',event)">
+        <div class="block-chrome">
+          <span class="bc-drag">⠿⠿</span>
+          <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span class="bc-name">Location</span>
+          <span class="bc-spacer"></span>
+          <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('location')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Location removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></span>
+        </div>
+        <div class="card">
+          <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Edit location →</div>
+          <div class="c-head">Tiburón Golf Club</div><div class="c-sub">2620 Tiburon Dr, Naples, FL 34109</div>
+          <div class="map"><div class="pin"></div></div>
+        </div>
       </div>
       <!-- schedule -->
-      <div class="card" data-block="schedule" data-manage="schedule" onclick="cardClick(this,'schedule',event)">
-        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'schedule')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
-        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Edit schedule →</div>
-        <div class="c-head">Schedule</div>
-        <div class="sch">
-          <div class="sch-row"><div class="sch-t">Welcome</div><div class="sch-time">7:45 AM</div></div>
-          <div class="sch-row"><div class="sch-t">Breakfast</div><div class="sch-time">8:00 – 9:15 AM</div></div>
-          <div class="sch-row"><div class="sch-t">Shotgun Start</div><div class="sch-time">9:30 AM</div></div>
-          <div class="sch-row"><div class="sch-t">Lunch at The Turn</div><div class="sch-time">12:00 – 12:30 PM</div></div>
+      <div class="wcol" data-block="schedule" data-manage="schedule" onclick="cardClick(this,'schedule',event)">
+        <div class="block-chrome">
+          <span class="bc-drag">⠿⠿</span>
+          <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          <span class="bc-name">Schedule</span>
+          <span class="bc-spacer"></span>
+          <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();widgetClick('schedule')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg></button><button class="bc-btn danger" onclick="event.stopPropagation();toast('Schedule removed')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2L8 22a2 2 0 01-2-2L5 6"/></svg></button></span>
+        </div>
+        <div class="card">
+          <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Edit schedule →</div>
+          <div class="c-head">Schedule</div>
+          <div class="sch">
+            <div class="sch-row"><div class="sch-t">Welcome</div><div class="sch-time">7:45 AM</div></div>
+            <div class="sch-row"><div class="sch-t">Breakfast</div><div class="sch-time">8:00 – 9:15 AM</div></div>
+            <div class="sch-row"><div class="sch-t">Shotgun Start</div><div class="sch-time">9:30 AM</div></div>
+            <div class="sch-row"><div class="sch-t">Lunch at The Turn</div><div class="sch-time">12:00 – 12:30 PM</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -584,8 +611,7 @@
 
   function selectBlock(el,kind,e){
     if(currentMode!=='edit') return;
-    if(e && (e.target.closest('.editable')||e.target.closest('.bc-actions')||e.target.closest('[data-manage] .card'))) {}
-    document.querySelectorAll('.block.selected').forEach(function(b){b.classList.remove('selected')});
+    document.querySelectorAll('.selected').forEach(function(b){b.classList.remove('selected')});
     el.classList.add('selected');
     openInspector(kind);
   }
