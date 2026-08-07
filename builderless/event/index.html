@@ -161,8 +161,17 @@
   .meta .l2{font-size:12.5px;color:var(--muted)}
 
   /* Cards row inside a block */
-  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
+  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:box-shadow .15s}
+  /* each widget is independently selectable in edit mode */
+  body.mode-edit .card{cursor:pointer}
+  body.mode-edit .card:hover{box-shadow:0 0 0 1px var(--line-2)}
+  body.mode-edit .card.selected{box-shadow:0 0 0 2px var(--accent)}
+  .w-gear{position:absolute;top:9px;right:9px;z-index:6;display:none;width:28px;height:28px;border-radius:8px;
+    align-items:center;justify-content:center;background:rgba(14,14,19,0.92);border:1px solid var(--line-2);color:var(--muted)}
+  .w-gear:hover{color:var(--ink);border-color:var(--accent)}
+  .w-gear svg{width:14px;height:14px}
+  body.mode-edit .card:hover .w-gear,body.mode-edit .card.selected .w-gear{display:flex}
   .c-head{padding:13px 15px 0;font-size:13px;font-weight:600}
   .c-sub{padding:2px 15px 0;font-size:11px;color:var(--muted)}
   .gl{padding:12px 12px 14px;display:flex;flex-direction:column;gap:7px}
@@ -395,50 +404,41 @@
 
     <div class="ins" onclick="insAdd()"></div>
 
-    <!-- ═══ BLOCK: Widgets row ═══ -->
-    <section class="block" data-block="widgets" onclick="selectBlock(this,'widgets',event)">
-      <div class="block-chrome">
-        <span class="bc-drag">⠿⠿</span>
-        <span class="bc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-        <span class="bc-name">Highlights row</span>
-        <span class="bc-stat neutral">3 widgets</span>
-        <span class="bc-spacer"></span>
-        <span class="bc-actions"><button class="bc-btn" onclick="event.stopPropagation();openInspector('widgets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button></span>
-      </div>
-      <div class="block-body">
-        <div class="cards">
-          <!-- guestlist -->
-          <div class="card" data-manage="guests" onclick="widgetClick('guests',event)">
-            <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage guests →</div>
-            <div class="c-head">Guestlist <span class="w-stat">· 142 going</span></div>
-            <div class="gl">
-              <div class="gl-row"><span class="gl-av" style="background:#e08a6b"></span><span class="gl-name">Davey Crockett</span></div>
-              <div class="gl-row"><span class="gl-av" style="background:#6ba3e0"></span><span class="gl-name">Jamie Davidson</span></div>
-              <div class="gl-row"><span class="gl-av" style="background:#8a6be0"></span><span class="gl-name">Katie Simmons</span></div>
-              <div class="gl-row"><span class="gl-av" style="background:#e0c86b"></span><span class="gl-name">Kammy Short</span></div>
-              <div class="gl-row"><span class="gl-av" style="background:#6be0a3"></span><span class="gl-name">Mike Wazowski</span></div>
-            </div>
-          </div>
-          <!-- map -->
-          <div class="card" data-manage="location" onclick="widgetClick('location',event)">
-            <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Edit location →</div>
-            <div class="c-head">Tiburón Golf Club</div><div class="c-sub">2620 Tiburon Dr, Naples, FL 34109</div>
-            <div class="map"><div class="pin"></div></div>
-          </div>
-          <!-- schedule -->
-          <div class="card" data-manage="schedule" onclick="widgetClick('schedule',event)">
-            <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Edit schedule →</div>
-            <div class="c-head">Schedule</div>
-            <div class="sch">
-              <div class="sch-row"><div class="sch-t">Welcome</div><div class="sch-time">7:45 AM</div></div>
-              <div class="sch-row"><div class="sch-t">Breakfast</div><div class="sch-time">8:00 – 9:15 AM</div></div>
-              <div class="sch-row"><div class="sch-t">Shotgun Start</div><div class="sch-time">9:30 AM</div></div>
-              <div class="sch-row"><div class="sch-t">Lunch at The Turn</div><div class="sch-time">12:00 – 12:30 PM</div></div>
-            </div>
-          </div>
+    <!-- ═══ Widgets row — each is its own selectable widget ═══ -->
+    <div class="cards">
+      <!-- guestlist -->
+      <div class="card" data-block="guestlist" data-manage="guests" onclick="cardClick(this,'guestlist',event)">
+        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'guestlist')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage guests →</div>
+        <div class="c-head">Guestlist <span class="w-stat">· 142 going</span></div>
+        <div class="gl">
+          <div class="gl-row"><span class="gl-av" style="background:#e08a6b"></span><span class="gl-name">Davey Crockett</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#6ba3e0"></span><span class="gl-name">Jamie Davidson</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#8a6be0"></span><span class="gl-name">Katie Simmons</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#e0c86b"></span><span class="gl-name">Kammy Short</span></div>
+          <div class="gl-row"><span class="gl-av" style="background:#6be0a3"></span><span class="gl-name">Mike Wazowski</span></div>
         </div>
       </div>
-    </section>
+      <!-- map -->
+      <div class="card" data-block="location" data-manage="location" onclick="cardClick(this,'location',event)">
+        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'location')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Edit location →</div>
+        <div class="c-head">Tiburón Golf Club</div><div class="c-sub">2620 Tiburon Dr, Naples, FL 34109</div>
+        <div class="map"><div class="pin"></div></div>
+      </div>
+      <!-- schedule -->
+      <div class="card" data-block="schedule" data-manage="schedule" onclick="cardClick(this,'schedule',event)">
+        <button class="w-gear" onclick="event.stopPropagation();selectCard(this.closest('.card'),'schedule')" title="Widget settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg></button>
+        <div class="w-manage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Edit schedule →</div>
+        <div class="c-head">Schedule</div>
+        <div class="sch">
+          <div class="sch-row"><div class="sch-t">Welcome</div><div class="sch-time">7:45 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Breakfast</div><div class="sch-time">8:00 – 9:15 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Shotgun Start</div><div class="sch-time">9:30 AM</div></div>
+          <div class="sch-row"><div class="sch-t">Lunch at The Turn</div><div class="sch-time">12:00 – 12:30 PM</div></div>
+        </div>
+      </div>
+    </div>
 
     <div class="ins" onclick="insAdd()"></div>
 
@@ -557,11 +557,18 @@
       '</div>'+
       '<div class="ins-sect"><div class="lbl">Cover &amp; logo</div>'+insRow('Show cover image','',true)+insRow('Show host logo','',true)+'</div>'
     },
-    widgets:{title:'Highlights row',manage:'Configure widgets',fields:
-      '<div class="ins-sect"><div class="lbl">Widgets in this row</div>'+
-        insRow('Guestlist','142 going',true)+insRow('Location map','Tiburón Golf Club',true)+insRow('Schedule','5 items',true)+insRow('Countdown','off',false)+
-      '</div>'+
-      '<div class="ins-sect"><div class="lbl">Layout</div><div class="seg-mini"><button class="on">3 across</button><button>2 across</button><button>Stacked</button></div></div>'
+    guestlist:{title:'Guestlist',manage:'Manage guests',fields:
+      '<div class="ins-sect"><div class="lbl">Display</div>'+insRow('Section heading','Guestlist',true)+insRow('Show going count','142 going',true)+insRow('Show avatars','',true)+'</div>'+
+      '<div class="ins-sect"><div class="lbl">Who to show</div><div class="seg-mini"><button class="on">Going</button><button>All</button><button>Hosts</button></div></div>'+
+      '<div class="ins-sect"><div class="lbl">Max names shown</div><input class="ins-input" value="5"></div>'
+    },
+    location:{title:'Location map',manage:'Change location',fields:
+      '<div class="ins-sect"><div class="lbl">Content</div>'+insField('Venue name','Tiburón Golf Club')+insField('Address','2620 Tiburon Dr, Naples, FL 34109')+'</div>'+
+      '<div class="ins-sect"><div class="lbl">Map</div>'+insRow('Show map','',true)+insRow('Show directions link','',true)+'</div>'
+    },
+    schedule:{title:'Schedule',manage:'Edit schedule',fields:
+      '<div class="ins-sect"><div class="lbl">Display</div>'+insRow('Section heading','Schedule',true)+insRow('Show times','',true)+'</div>'+
+      '<div class="ins-sect"><div class="lbl">Style</div><div class="seg-mini"><button class="on">List</button><button>Timeline</button></div></div>'
     },
     photos:{title:'Photo gallery',manage:'Manage photos',fields:
       '<div class="ins-sect"><div class="lbl">Layout</div><div class="seg-mini"><button class="on">Stacked</button><button>Grid</button><button>Carousel</button></div></div>'+
@@ -582,23 +589,37 @@
     el.classList.add('selected');
     openInspector(kind);
   }
+  var MANAGE_KEY={details:'guests',guestlist:'guests',location:'location',schedule:'schedule',photos:'photos',faq:'faq'};
   function openInspector(kind){
     var d=INSPECT[kind]; if(!d) return;
     document.getElementById('inspTitle').textContent=d.title;
     document.getElementById('inspBody').innerHTML=d.fields;
-    var mb=document.getElementById('inspManageBtn'); mb.textContent=d.manage; mb.onclick=function(){ var mk=({details:'guests',widgets:'guests',photos:'photos',faq:'faq'})[kind]; widgetClick(mk); };
+    var mb=document.getElementById('inspManageBtn'); mb.textContent=d.manage; mb.onclick=function(){ widgetClick(MANAGE_KEY[kind]); };
     document.body.classList.add('inspector-open');
     document.getElementById('inspector').classList.add('open');
-    // reflect selection
-    var blk=document.querySelector('.block[data-block="'+kind+'"]');
-    if(blk){document.querySelectorAll('.block.selected').forEach(function(b){b.classList.remove('selected')});blk.classList.add('selected');}
+    // reflect selection on whichever element carries this block id
+    document.querySelectorAll('.selected').forEach(function(b){b.classList.remove('selected')});
+    var el=document.querySelector('[data-block="'+kind+'"]');
+    if(el) el.classList.add('selected');
   }
   function closeInspector(){
     document.getElementById('inspector').classList.remove('open');
     document.body.classList.remove('inspector-open');
-    document.querySelectorAll('.block.selected').forEach(function(b){b.classList.remove('selected')});
+    document.querySelectorAll('.selected').forEach(function(b){b.classList.remove('selected')});
   }
   function insAdd(){ toggleAddMenu(); }
+
+  /* per-widget select (cards in the row) */
+  function cardClick(el,kind,e){
+    if(e) e.stopPropagation();
+    if(currentMode==='edit'){ selectCard(el,kind); }
+    else { openDrawer(MANAGE_KEY[kind]); }
+  }
+  function selectCard(el,kind){
+    document.querySelectorAll('.selected').forEach(function(b){b.classList.remove('selected')});
+    el.classList.add('selected');
+    openInspector(kind);
+  }
 
   /* ── Add menu ── */
   function toggleAddMenu(e){if(e)e.stopPropagation();document.getElementById('addMenu').classList.toggle('open');}
@@ -608,10 +629,6 @@
   /* ── Preview-mode management drawers ── */
   function widgetClick(kind,e){
     if(e) e.stopPropagation();
-    if(currentMode==='edit'){ // in edit, widget click opens its inspector where relevant
-      var bk={guests:'widgets',location:'widgets',schedule:'widgets',photos:'photos',faq:'faq'}[kind];
-      if(bk){openInspector(bk);return;}
-    }
     openDrawer(kind);
   }
   var DRAWERS={
