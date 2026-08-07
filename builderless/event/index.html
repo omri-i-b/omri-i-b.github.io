@@ -21,6 +21,30 @@
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   .muted{color:var(--muted)}
 
+  /* ═══ APP SHELL ═══ */
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:236px;flex-shrink:0;background:#131318;border-right:1px solid var(--line);
+    position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:65}
+  .sb-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+  .sb-brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px}
+  .sb-brand .m{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#7c5cff,#6846f0);display:flex;align-items:center;justify-content:center}
+  .sb-brand .m svg{width:13px;height:13px}
+  .sb-collapse{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted-2)}
+  .sb-collapse:hover{background:var(--panel-2);color:var(--ink)}
+  .sb-nav{flex:1;overflow-y:auto;padding:6px 10px}
+  .sb-sect{font-size:10px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.06em;padding:14px 8px 6px}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .12s;margin-bottom:1px}
+  .sb-item:hover{background:var(--panel-2);color:var(--ink)}
+  .sb-item.active{background:var(--accent-soft);color:#fff}
+  .sb-item.active svg{color:var(--accent)}
+  .sb-item svg{width:16px;height:16px;flex-shrink:0}
+  .sb-item .badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--accent);color:#fff;padding:1px 7px;border-radius:20px}
+  .sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+  .sb-user .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#e0a86b,#c88a4a);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#3a2a10}
+  .sb-user .nm{font-size:12.5px;font-weight:600}
+  .sb-user .em{font-size:11px;color:var(--muted)}
+  .main{flex:1;min-width:0;position:relative}
+
   /* Canvas grid in edit mode */
   body.mode-edit{background:
     radial-gradient(circle at 1px 1px, rgba(255,255,255,0.045) 1px, transparent 0) 0 0/22px 22px,
@@ -62,7 +86,8 @@
       linear-gradient(120deg,#2c4a2f,#1e3a3f 55%,#20202a);z-index:0;transition:opacity .3s}
   body.mode-edit .hero-bg{opacity:.35}
   .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:34px 20px 160px;transition:max-width .3s}
-  body.mode-edit.inspector-open .page{margin-right:calc(50% - 450px + 20px)}
+  .main{transition:padding-right .24s}
+  body.mode-edit.inspector-open .main{padding-right:340px}
 
   /* Invite bar */
   .invite-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 8px;
@@ -212,7 +237,7 @@
   .ins-foot{padding:14px 18px;border-top:1px solid var(--line)}
 
   /* ═══ FAST-ACTIONS TOOLBAR ═══ */
-  #fabBar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);z-index:70;
+  #fabBar{position:fixed;bottom:22px;left:calc(50% + 118px);transform:translateX(-50%) translateY(120px);z-index:70;
     display:flex;align-items:center;gap:6px;padding:7px;background:rgba(24,24,32,0.94);border:1px solid var(--line-2);
     border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.55);backdrop-filter:blur(16px);transition:transform .25s cubic-bezier(.4,0,.2,1)}
   body.mode-edit #fabBar{transform:translateX(-50%) translateY(0)}
@@ -225,7 +250,7 @@
   .fab-add:hover{background:var(--accent-hover);color:#fff}
   .fab-add svg{width:16px;height:16px}
 
-  #addMenu{position:fixed;bottom:92px;left:50%;transform:translateX(-50%) translateY(10px);z-index:71;
+  #addMenu{position:fixed;bottom:92px;left:calc(50% + 118px);transform:translateX(-50%) translateY(10px);z-index:71;
     width:340px;background:var(--panel);border:1px solid var(--line-2);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.6);
     padding:8px;opacity:0;pointer-events:none;transition:all .18s}
   #addMenu.open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
@@ -265,7 +290,33 @@
 </style>
 </head>
 <body class="mode-preview">
+<div class="layout">
 
+  <!-- ═══ LEFT NAV ═══ -->
+  <aside class="sidebar">
+    <div class="sb-top">
+      <div class="sb-brand"><span class="m"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>builderless</div>
+      <button class="sb-collapse" title="Collapse"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></button>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sect">Event</div>
+      <div class="sb-item active" onclick="navTo(this,'Overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Overview</div>
+      <div class="sb-item" onclick="navTo(this,'Event details')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Event details</div>
+      <div class="sb-item" onclick="navTo(this,'Registration')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Registration</div>
+      <div class="sb-item" onclick="navTo(this,'Tickets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 013-3h14a3 3 0 013 3 3 3 0 010 6 3 3 0 010 6H5a3 3 0 010-6 3 3 0 010-6z"/></svg>Tickets</div>
+      <div class="sb-sect">Manage</div>
+      <div class="sb-item" onclick="navTo(this,'Guests'); widgetClick('guests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Guests<span class="badge">142</span></div>
+      <div class="sb-item" onclick="navTo(this,'Check-in')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Check-in</div>
+      <div class="sb-item" onclick="navTo(this,'Communications')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Communications</div>
+      <div class="sb-sect">Configure</div>
+      <div class="sb-item" onclick="navTo(this,'Branding')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Branding</div>
+      <div class="sb-item" onclick="navTo(this,'Settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82 2 2 0 11-2.83 2.83 1.65 1.65 0 00-2.82 1.18 2 2 0 01-4 0 1.65 1.65 0 00-2.82-1.18 2 2 0 11-2.83-2.83A1.65 1.65 0 004.6 15a2 2 0 010-4 1.65 1.65 0 001.18-2.82 2 2 0 112.83-2.83A1.65 1.65 0 0011.4 4.6a2 2 0 014 0 1.65 1.65 0 002.82 1.18 2 2 0 112.83 2.83A1.65 1.65 0 0019.4 11a2 2 0 010 4z"/></svg>Settings</div>
+    </nav>
+    <div class="sb-user"><span class="av">DH</span><div><div class="nm">Daniel Hendricks</div><div class="em">daniel@acme.co</div></div></div>
+  </aside>
+
+  <!-- ═══ MAIN (canvas) ═══ -->
+  <section class="main">
   <!-- ═══ TOOLBAR ═══ -->
   <div class="toolbar">
     <div class="tb-left">
@@ -429,6 +480,8 @@
 
     <div class="ins" onclick="insAdd()"></div>
   </div>
+  </section>
+</div>
 
   <!-- ═══ RIGHT INSPECTOR ═══ -->
   <aside id="inspector">
@@ -485,6 +538,12 @@
   }
   var toastTimer;
   function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},1600);}
+
+  function navTo(el,name){
+    document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active')});
+    el.classList.add('active');
+    if(name!=='Overview' && !DRAWERS[name.toLowerCase()]) toast('→ ' + name);
+  }
 
   /* ── Block selection + inspector (edit mode) ── */
   var INSPECT = {
