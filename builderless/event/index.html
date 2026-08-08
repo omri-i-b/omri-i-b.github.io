@@ -274,6 +274,22 @@
   .am-added{font-size:10.5px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:3px}
   .am-added svg{width:12px;height:12px}
   .am-plus{color:var(--accent);font-size:18px;font-weight:400}
+  .am-pro{font-size:9.5px;font-weight:800;color:#111;background:var(--edit);padding:2px 7px;border-radius:20px;letter-spacing:.02em}
+
+  /* Upgrade-to-Builder modal */
+  #upScrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:95;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  #upScrim.open{display:flex}
+  .up-modal{width:460px;max-width:92vw;background:var(--panel);border:1px solid var(--line-2);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  .up-top{padding:24px 26px;background:linear-gradient(135deg,rgba(240,168,54,0.16),rgba(104,70,240,0.18))}
+  .up-ic{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#7c5cff,#6846f0);display:flex;align-items:center;justify-content:center;margin-bottom:13px}
+  .up-ic svg{width:23px;height:23px;color:#fff}
+  .up-top h2{font-size:19px;font-weight:800}
+  .up-top p{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .up-body{padding:18px 26px 24px}
+  .up-feat{display:flex;align-items:center;gap:11px;font-size:13.5px;padding:7px 0}
+  .up-feat svg{width:16px;height:16px;color:var(--accent);flex-shrink:0}
+  .up-actions{display:flex;gap:8px;margin-top:18px}
+  .up-compare{margin-top:14px;font-size:11.5px;color:var(--muted-2);text-align:center}
 
   /* Drawer + toast */
   #drawerScrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none}
@@ -343,6 +359,7 @@
       </button>
     </div>
     <div class="tb-right">
+      <button class="btn" onclick="openUpgrade()" style="border-color:rgba(240,168,54,0.4);color:var(--edit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Builder</button>
       <button class="btn" onclick="toast('Link copied')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Share</button>
       <button class="btn btn-primary" onclick="toast('Published ✓')">Publish</button>
     </div>
@@ -521,6 +538,10 @@
     <div class="am-item" onclick="addSection('Speakers')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="am-txt"><div class="am-name">Speakers</div><div class="am-desc">Feature hosts, DJs, or presenters</div></div><span class="am-plus">+</span></div>
     <div class="am-item" onclick="addSection('Text block')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></div><div class="am-txt"><div class="am-name">Text block</div><div class="am-desc">Freeform rich text</div></div><span class="am-plus">+</span></div>
     <div class="am-item" onclick="addSection('Countdown')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/></svg></div><div class="am-txt"><div class="am-name">Countdown</div><div class="am-desc">Ticking timer to the event</div></div><span class="am-plus">+</span></div>
+    <div class="am-title" style="display:flex;align-items:center;justify-content:space-between">Needs Builder <span style="color:var(--accent);text-transform:none;letter-spacing:0;font-weight:600;font-size:10px;">Upgrade to unlock</span></div>
+    <div class="am-item" onclick="openUpgrade('Custom HTML')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="am-txt"><div class="am-name">Custom HTML</div><div class="am-desc">Embed your own code</div></div><span class="am-pro">Builder</span></div>
+    <div class="am-item" onclick="openUpgrade('Custom layout')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div class="am-txt"><div class="am-name">Custom layout</div><div class="am-desc">Drag-and-drop your own structure</div></div><span class="am-pro">Builder</span></div>
+    <div class="am-item" onclick="openUpgrade('Seating chart')"><div class="am-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="8" rx="2"/><path d="M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/></svg></div><div class="am-txt"><div class="am-name">Seating chart</div><div class="am-desc">Interactive table &amp; seat picker</div></div><span class="am-pro">Builder</span></div>
   </div>
 
   <!-- Fast-actions toolbar -->
@@ -542,8 +563,41 @@
     <div class="dr-body" id="drBody"></div>
   </aside>
 
+  <!-- Upgrade to Builder modal -->
+  <div id="upScrim" onclick="if(event.target===this)closeUpgrade()">
+    <div class="up-modal">
+      <div class="up-top">
+        <div class="up-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <h2 id="upTitle">Ready for more control?</h2>
+        <p id="upSub">The simple editor keeps it effortless. <strong>Builder</strong> unlocks a full drag-and-drop canvas when you need to go further.</p>
+      </div>
+      <div class="up-body">
+        <div class="up-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Full WYSIWYG canvas — drag, resize, and lay out anything</div>
+        <div class="up-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Custom HTML, embeds &amp; premium widgets</div>
+        <div class="up-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Fine-grained control over color, type &amp; spacing</div>
+        <div class="up-actions">
+          <button class="btn" style="flex:1;justify-content:center" onclick="closeUpgrade()">Stay simple</button>
+          <button class="btn btn-primary" style="flex:1.5;justify-content:center" onclick="goBuilder()">Upgrade to Builder →</button>
+        </div>
+        <div class="up-compare">You keep everything you've built — your page opens right in Builder.</div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast"></div>
 
+<script>
+  function openUpgrade(what){
+    document.getElementById('addMenu').classList.remove('open');
+    if(what){
+      document.getElementById('upTitle').textContent = what + ' needs Builder';
+      document.getElementById('upSub').innerHTML = '<strong>'+what+'</strong> isn\'t available in the simple editor. Upgrade to <strong>Builder</strong> for a full drag-and-drop canvas, custom code, and premium widgets.';
+    }
+    document.getElementById('upScrim').classList.add('open');
+  }
+  function closeUpgrade(){ document.getElementById('upScrim').classList.remove('open'); }
+  function goBuilder(){ toast('Opening Builder…'); setTimeout(function(){ window.location.href='../builder/'; }, 500); }
+</script>
 <script>
   var currentMode='preview';
   function setMode(m){
