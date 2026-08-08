@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builderless · Advanced Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --accent:#6846f0;--accent-hover:#5a3ce0;--accent-soft:rgba(104,70,240,0.16);
+    --blue:#4c8dff;--pro:#f0a836;
+    --bg:#0d0d12;--chrome:#151520;--chrome-2:#1c1c28;--panel:#191922;--panel-2:#20202b;--panel-3:#282833;
+    --line:#2a2a36;--line-2:#353542;--ink:#f3f3f6;--muted:#9a9aa8;--muted-2:#6a6a78;--green:#2f9e63;
+    --font:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select{font-family:inherit}
+  .muted{color:var(--muted)}
+
+  /* ═══ TOP BAR ═══ */
+  .topbar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+    background:var(--chrome);border-bottom:1px solid var(--line);position:relative;z-index:40}
+  .tb-l,.tb-r{display:flex;align-items:center;gap:8px}
+  .tb-c{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px}
+  .logo{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#7c5cff,#6846f0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  .adv-pill{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--pro);background:rgba(240,168,54,0.12);border:1px solid rgba(240,168,54,0.3);padding:3px 9px;border-radius:20px}
+  .adv-pill svg{width:11px;height:11px}
+  .icon-btn{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .icon-btn:hover{background:var(--chrome-2);color:var(--ink)}
+  .icon-btn svg{width:16px;height:16px}
+  .icon-btn.disabled{opacity:.35;pointer-events:none}
+  /* device switcher */
+  .devices{display:flex;background:var(--chrome-2);border:1px solid var(--line);border-radius:9px;padding:2px}
+  .dev{width:30px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .dev.on{background:var(--panel-3);color:var(--ink)}
+  .dev svg{width:15px;height:15px}
+  .btn{padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--chrome-2);color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{background:var(--panel-3)}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-hover)}
+  .btn svg{width:13px;height:13px}
+
+  /* ═══ SHELL ═══ */
+  .shell{display:flex;height:calc(100vh - 48px)}
+  .left{width:280px;flex-shrink:0;background:var(--chrome);border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .right{width:300px;flex-shrink:0;background:var(--chrome);border-left:1px solid var(--line);display:flex;flex-direction:column}
+  .stage{flex:1;overflow:auto;background:
+    radial-gradient(circle at 1px 1px,rgba(255,255,255,0.04) 1px,transparent 0) 0 0/24px 24px,var(--bg);
+    display:flex;justify-content:center;padding:34px 24px 120px}
+
+  /* Panel tabs */
+  .ptabs{display:flex;border-bottom:1px solid var(--line);flex-shrink:0}
+  .ptab{flex:1;padding:11px;font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:2px solid transparent}
+  .ptab.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .ptab svg{width:14px;height:14px}
+  .pbody{flex:1;overflow-y:auto;padding:12px}
+
+  /* Element library */
+  .lib-search{width:100%;background:var(--chrome-2);border:1px solid var(--line);border-radius:9px;padding:8px 11px;color:var(--ink);font-size:12.5px;margin-bottom:12px}
+  .lib-search::placeholder{color:var(--muted-2)}
+  .lib-cat{font-size:10.5px;font-weight:700;color:var(--muted-2);text-transform:uppercase;letter-spacing:.05em;margin:14px 4px 8px}
+  .lib-cat:first-child{margin-top:0}
+  .lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .lib-item{background:var(--chrome-2);border:1px solid var(--line);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:grab;transition:all .12s;position:relative}
+  .lib-item:hover{border-color:var(--accent);background:var(--panel-2)}
+  .lib-item .li-ic{color:var(--muted)}
+  .lib-item:hover .li-ic{color:var(--ink)}
+  .lib-item .li-ic svg{width:19px;height:19px}
+  .lib-item .li-t{font-size:11.5px;font-weight:600}
+  .lib-item.pro{border-color:rgba(240,168,54,0.25)}
+  .li-pro{position:absolute;top:6px;right:6px;font-size:8.5px;font-weight:800;color:#111;background:var(--pro);padding:1px 5px;border-radius:20px;letter-spacing:.03em}
+
+  /* Layers tree */
+  .layer{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;font-size:12.5px;color:var(--muted);cursor:pointer}
+  .layer:hover{background:var(--chrome-2);color:var(--ink)}
+  .layer.on{background:var(--accent-soft);color:#fff}
+  .layer.on svg{color:var(--accent)}
+  .layer svg{width:14px;height:14px;flex-shrink:0}
+  .layer.indent{margin-left:16px}
+  .layer.indent2{margin-left:32px}
+
+  /* ═══ CANVAS (event page, WYSIWYG-selectable) ═══ */
+  .canvas{width:900px;max-width:100%;position:relative;transition:width .25s}
+  .canvas.tablet{width:720px}.canvas.mobile{width:390px}
+  .cbg{position:absolute;inset:0;height:440px;border-radius:0 0 0 0;background:
+    linear-gradient(180deg,rgba(13,13,18,0.5),rgba(13,13,18,0.85) 55%,var(--bg)),
+    linear-gradient(120deg,#2c4a2f,#1e3a3f 55%,#20202a);z-index:0;opacity:.55}
+  .cpage{position:relative;z-index:1;padding:0}
+
+  /* selectable elements */
+  .el{position:relative;transition:box-shadow .1s}
+  .el:hover{box-shadow:inset 0 0 0 1px rgba(76,141,255,0.5)}
+  .el.sel{box-shadow:inset 0 0 0 2px var(--blue)}
+  .el-tag{position:absolute;top:-9px;left:-2px;z-index:20;display:none;background:var(--blue);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px 5px 5px 0;white-space:nowrap}
+  .el.sel>.el-tag{display:block}
+  .el.sel::after{content:'';position:absolute;bottom:-4px;right:-4px;width:8px;height:8px;background:#fff;border:1.5px solid var(--blue);border-radius:2px;z-index:20}
+
+  h1.title{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;padding:4px}
+  .desc{font-size:14.5px;line-height:1.6;color:#c9c9d2;max-width:560px;padding:4px;margin-top:8px}
+  .hero{display:flex;gap:24px;padding:22px 0}
+  .hlogo{width:150px;height:150px;border-radius:14px;flex-shrink:0;background:radial-gradient(circle at 40% 35%,#3a3a42,#222 70%);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .shield{width:96px;height:110px;background:linear-gradient(160deg,#1f7a4d,#0e5a37);border-radius:12px 12px 40% 40%/12px 12px 30% 30%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #f2c94c}
+  .shield .a{font-size:9px;font-weight:800;color:#f2c94c}.shield .b{font-size:15px;font-weight:800;color:#fff;font-style:italic}.shield .c{font-size:11px;font-weight:700;color:#f2c94c;font-style:italic}
+  .meta{display:flex;gap:28px;margin-top:14px;padding:4px}
+  .meta .m{display:flex;gap:8px;font-size:13px}.meta svg{width:16px;height:16px;color:var(--muted);flex-shrink:0;margin-top:2px}
+  .meta .l1{font-weight:600}.meta .l2{color:var(--muted);font-size:12px}
+  .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:8px;padding:6px}
+  .wc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+  .wc h4{font-size:13px;font-weight:600;margin-bottom:9px}
+  .glr{display:flex;align-items:center;gap:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;margin-bottom:6px;font-size:12px}
+  .glr i{width:20px;height:20px;border-radius:50%;display:block}
+  .cta-embed{margin-top:8px;padding:6px;}
+  .embed-box{border:1px dashed var(--line-2);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13px;background:rgba(25,25,34,0.5);font-family:'SF Mono',ui-monospace,monospace}
+
+  /* ═══ RIGHT INSPECTOR ═══ */
+  .insp-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .insp-head .tag{font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:2px 7px;border-radius:5px}
+  .insp-head .nm{font-size:13px;font-weight:600}
+  .insp-tabs{display:flex;gap:2px;padding:8px 10px 0;flex-shrink:0}
+  .insp-tab{flex:1;padding:7px;font-size:11.5px;font-weight:600;color:var(--muted);border-radius:7px;text-align:center}
+  .insp-tab.on{background:var(--chrome-2);color:var(--ink)}
+  .insp-body{flex:1;overflow-y:auto;padding:4px 0}
+  .sec{border-bottom:1px solid var(--line);padding:13px 14px}
+  .sec-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+  .fld{margin-bottom:10px}
+  .fld:last-child{margin-bottom:0}
+  .fl{font-size:11px;color:var(--muted);margin-bottom:5px}
+  .in{width:100%;background:var(--chrome-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--ink);font-size:12px}
+  .in:focus{outline:none;border-color:var(--accent)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .four{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+  /* color swatch row */
+  .color-row{display:flex;align-items:center;gap:8px}
+  .sw{width:26px;height:26px;border-radius:7px;border:1px solid var(--line-2);flex-shrink:0;cursor:pointer}
+  .seg2{display:flex;background:var(--chrome-2);border:1px solid var(--line);border-radius:8px;padding:2px;gap:2px}
+  .seg2 button{flex:1;padding:6px;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .seg2 button.on{background:var(--panel-3);color:var(--ink)}
+  .seg2 button svg{width:13px;height:13px}
+  .slider{-webkit-appearance:none;width:100%;height:4px;border-radius:3px;background:var(--panel-3);outline:none}
+  .slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+  .with-unit{display:flex;align-items:center;gap:6px}
+  .with-unit .in{flex:1}
+  .unit{font-size:11px;color:var(--muted-2);width:26px}
+  /* spacing box */
+  .spacing{background:var(--chrome-2);border:1px solid var(--line);border-radius:10px;padding:26px;position:relative}
+  .spacing .inner{border:1px solid var(--line-2);border-radius:6px;padding:20px;text-align:center;font-size:10px;color:var(--muted-2);position:relative}
+  .sp-v{position:absolute;font-size:10.5px;color:var(--muted);background:var(--chrome);padding:0 3px}
+  .sp-v.t{top:-7px;left:50%;transform:translateX(-50%)}
+  .sp-v.b{bottom:-7px;left:50%;transform:translateX(-50%)}
+  .sp-v.l{left:-9px;top:50%;transform:translateY(-50%)}
+  .sp-v.r{right:-9px;top:50%;transform:translateY(-50%)}
+  .empty-insp{padding:40px 20px;text-align:center;color:var(--muted-2);font-size:13px}
+  .empty-insp svg{width:28px;height:28px;margin-bottom:10px;opacity:.5}
+
+  /* upgrade / pro modal */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  .scrim.open{display:flex}
+  .modal{width:440px;max-width:92vw;background:var(--panel);border:1px solid var(--line-2);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .modal-top{padding:22px 24px;background:linear-gradient(135deg,rgba(240,168,54,0.14),rgba(104,70,240,0.14))}
+  .modal-ic{width:44px;height:44px;border-radius:12px;background:var(--pro);display:flex;align-items:center;justify-content:center;color:#111;margin-bottom:12px}
+  .modal-ic svg{width:22px;height:22px}
+  .modal h2{font-size:18px;font-weight:800}
+  .modal p{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .modal-body{padding:18px 24px 22px}
+  .feat{display:flex;align-items:center;gap:10px;font-size:13px;padding:6px 0}
+  .feat svg{width:15px;height:15px;color:var(--green);flex-shrink:0}
+  .modal-actions{display:flex;gap:8px;margin-top:16px}
+  /* code editor panel */
+  #codeScrim .modal{width:640px}
+  .code-area{width:100%;height:220px;background:#0c0c11;border:1px solid var(--line);border-radius:10px;padding:12px;color:#c9e5ff;font-family:'SF Mono',ui-monospace,monospace;font-size:12px;line-height:1.6;resize:vertical}
+  .code-area:focus{outline:none;border-color:var(--accent)}
+
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:#111;font-size:13px;font-weight:600;padding:10px 18px;border-radius:10px;z-index:95;transition:all .2s;pointer-events:none}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+  <!-- ═══ TOP BAR ═══ -->
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="logo">B</div>
+      <span style="font-size:13px;font-weight:600">X-CUP Winter Golf Scramble</span>
+      <span class="adv-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Advanced Builder</span>
+    </div>
+    <div class="tb-c">
+      <div class="devices">
+        <button class="dev on" onclick="setDevice(this,'')" title="Desktop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button>
+        <button class="dev" onclick="setDevice(this,'tablet')" title="Tablet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></button>
+        <button class="dev" onclick="setDevice(this,'mobile')" title="Mobile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></button>
+      </div>
+    </div>
+    <div class="tb-r">
+      <button class="icon-btn disabled" title="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg></button>
+      <button class="icon-btn" title="Redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3L21 13"/></svg></button>
+      <button class="btn" onclick="toast('Preview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Preview</button>
+      <button class="btn btn-primary" onclick="toast('Published ✓')">Publish</button>
+    </div>
+  </div>
+
+  <!-- ═══ SHELL ═══ -->
+  <div class="shell">
+
+    <!-- LEFT: element library / layers -->
+    <aside class="left">
+      <div class="ptabs">
+        <div class="ptab on" onclick="leftTab(this,'add')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</div>
+        <div class="ptab" onclick="leftTab(this,'layers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Layers</div>
+      </div>
+      <div class="pbody" id="leftAdd">
+        <input class="lib-search" placeholder="Search elements…">
+        <div class="lib-cat">Layout</div>
+        <div class="lib-grid">
+          <div class="lib-item" onclick="toast('Section added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span><span class="li-t">Section</span></div>
+          <div class="lib-item" onclick="toast('Columns added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/></svg></span><span class="li-t">Columns</span></div>
+          <div class="lib-item" onclick="toast('Grid added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span><span class="li-t">Grid</span></div>
+          <div class="lib-item" onclick="toast('Spacer added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 6 12 2 16 6"/><polyline points="8 18 12 22 16 18"/></svg></span><span class="li-t">Spacer</span></div>
+        </div>
+        <div class="lib-cat">Content</div>
+        <div class="lib-grid">
+          <div class="lib-item" onclick="toast('Heading added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M6 12h12"/></svg></span><span class="li-t">Heading</span></div>
+          <div class="lib-item" onclick="toast('Text added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></span><span class="li-t">Text</span></div>
+          <div class="lib-item" onclick="toast('Button added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="8" rx="4"/></svg></span><span class="li-t">Button</span></div>
+          <div class="lib-item" onclick="toast('Image added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M3 16l5-5 4 4 4-5 5 5"/></svg></span><span class="li-t">Image</span></div>
+        </div>
+        <div class="lib-cat">Event widgets</div>
+        <div class="lib-grid">
+          <div class="lib-item" onclick="toast('RSVP form added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span class="li-t">RSVP form</span></div>
+          <div class="lib-item" onclick="toast('Schedule added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="li-t">Schedule</span></div>
+          <div class="lib-item pro" onclick="openPro('Seating chart')"><span class="li-pro">PRO</span><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="8" rx="2"/><path d="M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/></svg></span><span class="li-t">Seating chart</span></div>
+          <div class="lib-item pro" onclick="openPro('Countdown')"><span class="li-pro">PRO</span><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/></svg></span><span class="li-t">Countdown</span></div>
+          <div class="lib-item pro" onclick="openPro('Livestream')"><span class="li-pro">PRO</span><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><span class="li-t">Livestream</span></div>
+          <div class="lib-item pro" onclick="openPro('Merch store')"><span class="li-pro">PRO</span><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span><span class="li-t">Merch store</span></div>
+        </div>
+        <div class="lib-cat">Advanced</div>
+        <div class="lib-grid">
+          <div class="lib-item" onclick="openCode()"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span><span class="li-t">Custom HTML</span></div>
+          <div class="lib-item" onclick="toast('Embed added')"><span class="li-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 12h8M12 8v8"/></svg></span><span class="li-t">Embed</span></div>
+        </div>
+      </div>
+      <div class="pbody" id="leftLayers" style="display:none">
+        <div class="layer" onclick="selectByLayer(this,'body')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Page</div>
+        <div class="layer indent" onclick="selectByLayer(this,'hero')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="8" rx="1"/></svg>Hero section</div>
+        <div class="layer indent2" onclick="selectByLayer(this,'title')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v16M18 4v16M6 12h12"/></svg>Heading — Title</div>
+        <div class="layer indent2" onclick="selectByLayer(this,'desc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/></svg>Text — Description</div>
+        <div class="layer indent" onclick="selectByLayer(this,'widgets')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/></svg>Widgets grid</div>
+        <div class="layer indent2 muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Guestlist</div>
+        <div class="layer indent2 muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Schedule</div>
+      </div>
+    </aside>
+
+    <!-- CENTER: canvas -->
+    <div class="stage">
+      <div class="canvas" id="canvas">
+        <div class="cbg"></div>
+        <div class="cpage">
+          <div class="el" data-el="hero" onclick="selectEl(this,event)">
+            <span class="el-tag">Hero section</span>
+            <div class="hero">
+              <div class="el hlogo" data-el="logo" onclick="selectEl(this,event)"><span class="el-tag">Image</span><div class="shield"><span class="a">X-CUP</span><span class="b">St Patty's</span><span class="c">Scramble</span></div></div>
+              <div style="flex:1">
+                <h1 class="el title" data-el="title" onclick="selectEl(this,event)"><span class="el-tag">Heading</span>X-CUP Winter Golf Scramble</h1>
+                <div class="el desc" data-el="desc" onclick="selectEl(this,event)"><span class="el-tag">Text</span>Bundle up and tee off! Join us for our annual Winter Golf Scramble, a 4-person best-ball format where the cold is the only real competition.</div>
+                <div class="meta">
+                  <div class="m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><div class="l1">March 15, 2026</div><div class="l2">6:00 PM – 8:30 PM</div></div></div>
+                  <div class="m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><div><div class="l1">Tiburón Golf Club</div><div class="l2">Naples, FL</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="el row" data-el="widgets" onclick="selectEl(this,event)">
+            <span class="el-tag">Widgets grid</span>
+            <div class="wc"><h4>Guestlist</h4><div class="glr"><i style="background:#e08a6b"></i>Davey Crockett</div><div class="glr"><i style="background:#6ba3e0"></i>Jamie Davidson</div><div class="glr"><i style="background:#8a6be0"></i>Katie Simmons</div></div>
+            <div class="wc"><h4>Location</h4><div style="height:120px;border-radius:10px;background:repeating-linear-gradient(45deg,#243b52,#243b52 10px,#22374c 10px,#22374c 20px)"></div></div>
+            <div class="wc"><h4>Schedule</h4><div class="glr">Welcome · 7:45 AM</div><div class="glr">Breakfast · 8:00 AM</div><div class="glr">Shotgun · 9:30 AM</div></div>
+          </div>
+
+          <!-- Custom HTML block placeholder -->
+          <div class="el" data-el="embed" onclick="selectEl(this,event)" style="padding:6px;display:none" id="embedBlock">
+            <span class="el-tag">Custom HTML</span>
+            <div class="embed-box">&lt;!-- your custom HTML renders here --&gt;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: style inspector -->
+    <aside class="right">
+      <div id="inspEmpty" class="empty-insp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+        <div>Select an element on the canvas to edit its style</div>
+      </div>
+      <div id="inspContent" style="display:none;flex:1;display:none;flex-direction:column">
+        <div class="insp-head"><span class="tag" id="inspTag">Heading</span><span class="nm" id="inspName">Title</span></div>
+        <div class="insp-tabs">
+          <div class="insp-tab on" onclick="inspTab(this,'style')">Style</div>
+          <div class="insp-tab" onclick="inspTab(this,'settings')">Settings</div>
+        </div>
+        <div class="insp-body" id="inspStyle">
+          <div class="sec">
+            <div class="sec-h">Layout</div>
+            <div class="fld"><div class="fl">Display</div><div class="seg2"><button class="on">Block</button><button>Flex</button><button>Grid</button><button>None</button></div></div>
+            <div class="two"><div class="fld"><div class="fl">Width</div><div class="with-unit"><input class="in" value="100"><span class="unit">%</span></div></div><div class="fld"><div class="fl">Height</div><div class="with-unit"><input class="in" value="Auto"><span class="unit">px</span></div></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Typography</div>
+            <div class="fld"><div class="fl">Font</div><select class="in"><option>Inter</option><option>Geist</option><option>Playfair Display</option><option>Space Grotesk</option></select></div>
+            <div class="two"><div class="fld"><div class="fl">Size</div><div class="with-unit"><input class="in" value="30"><span class="unit">px</span></div></div><div class="fld"><div class="fl">Weight</div><select class="in"><option>800 Extrabold</option><option>700 Bold</option><option>600 Semibold</option><option>400 Regular</option></select></div></div>
+            <div class="two"><div class="fld"><div class="fl">Line height</div><input class="in" value="1.1"></div><div class="fld"><div class="fl">Letter spacing</div><input class="in" value="-0.02em"></div></div>
+            <div class="fld"><div class="fl">Color</div><div class="color-row"><span class="sw" style="background:#f3f3f6"></span><input class="in" value="#F3F3F6"></div></div>
+            <div class="fld"><div class="seg2"><button class="on" title="Left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg></button><button title="Center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button><button title="Right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg></button></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Spacing</div>
+            <div class="spacing"><div class="inner">CONTENT<span class="sp-v t">24</span><span class="sp-v b">24</span><span class="sp-v l">0</span><span class="sp-v r">0</span></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Background</div>
+            <div class="fld"><div class="seg2"><button class="on">Color</button><button>Gradient</button><button>Image</button></div></div>
+            <div class="fld"><div class="color-row"><span class="sw" style="background:transparent;background-image:linear-gradient(45deg,#444 25%,transparent 25%,transparent 75%,#444 75%),linear-gradient(45deg,#444 25%,#222 25%,#222 75%,#444 75%);background-size:8px 8px;background-position:0 0,4px 4px"></span><input class="in" value="Transparent"></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Border &amp; radius</div>
+            <div class="two"><div class="fld"><div class="fl">Width</div><div class="with-unit"><input class="in" value="0"><span class="unit">px</span></div></div><div class="fld"><div class="fl">Radius</div><div class="with-unit"><input class="in" value="8"><span class="unit">px</span></div></div></div>
+            <div class="fld"><div class="fl">Border color</div><div class="color-row"><span class="sw" style="background:#2a2a36"></span><input class="in" value="#2A2A36"></div></div>
+          </div>
+          <div class="sec" style="border-bottom:none">
+            <div class="sec-h">Effects</div>
+            <div class="fld"><div class="fl">Opacity <span style="float:right;color:var(--muted)">100%</span></div><input type="range" class="slider" min="0" max="100" value="100"></div>
+            <div class="fld"><div class="fl">Shadow</div><select class="in"><option>None</option><option>Small</option><option>Medium</option><option>Large</option><option>Glow</option></select></div>
+          </div>
+        </div>
+        <div class="insp-body" id="inspSettings" style="display:none">
+          <div class="sec"><div class="sec-h">Element</div>
+            <div class="fld"><div class="fl">Text content</div><input class="in" value="X-CUP Winter Golf Scramble"></div>
+            <div class="fld"><div class="fl">Link (optional)</div><input class="in" placeholder="https://"></div>
+            <div class="fld"><div class="fl">HTML tag</div><select class="in"><option>h1</option><option>h2</option><option>h3</option><option>p</option><option>div</option></select></div>
+          </div>
+          <div class="sec"><div class="sec-h">Visibility</div>
+            <div class="fld"><div class="seg2"><button class="on">Desktop</button><button>Tablet</button><button>Mobile</button></div><div class="fl" style="margin-top:8px">Shown on all breakpoints</div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- PRO upgrade modal -->
+  <div class="scrim" id="proScrim" onclick="if(event.target===this)closePro()">
+    <div class="modal">
+      <div class="modal-top">
+        <div class="modal-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <h2 id="proTitle">Seating chart is a Pro widget</h2>
+        <p>Upgrade to Builder Pro to drop in premium widgets, sell add-ons, and unlock full styling control.</p>
+      </div>
+      <div class="modal-body">
+        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Premium widgets — seating, countdown, livestream, merch</div>
+        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Custom HTML / CSS &amp; embeds</div>
+        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Full control over colors, type &amp; spacing</div>
+        <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Sell paid add-ons on your event page</div>
+        <div class="modal-actions">
+          <button class="btn" style="flex:1;justify-content:center" onclick="closePro()">Not now</button>
+          <button class="btn btn-primary" style="flex:1.4;justify-content:center" onclick="closePro();toast('Upgrade flow →')">Upgrade to Pro — $19/mo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom HTML editor modal -->
+  <div class="scrim" id="codeScrim" onclick="if(event.target===this)closeCode()">
+    <div class="modal">
+      <div class="modal-top" style="background:var(--chrome-2)">
+        <h2 style="font-size:16px">Custom HTML</h2>
+        <p>Paste any HTML/CSS. It renders inline on your event page.</p>
+      </div>
+      <div class="modal-body">
+        <textarea class="code-area" spellcheck="false">&lt;div style="padding:24px;border-radius:14px;
+     background:linear-gradient(135deg,#6846f0,#a44cff);
+     color:#fff;text-align:center"&gt;
+  &lt;h3 style="margin:0;font-size:20px"&gt;🏌️ Sponsored by Titleist&lt;/h3&gt;
+  &lt;p style="margin:6px 0 0;opacity:.85"&gt;
+    Swing by the pro shop for 20% off&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        <div class="modal-actions">
+          <button class="btn" style="flex:1;justify-content:center" onclick="closeCode()">Cancel</button>
+          <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="addEmbed()">Add to page</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  var toastTimer;
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},1600);}
+
+  function leftTab(el,which){
+    document.querySelectorAll('.left .ptab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');
+    document.getElementById('leftAdd').style.display=which==='add'?'block':'none';
+    document.getElementById('leftLayers').style.display=which==='layers'?'block':'none';
+  }
+  function inspTab(el,which){
+    document.querySelectorAll('.insp-tab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');
+    document.getElementById('inspStyle').style.display=which==='style'?'block':'none';
+    document.getElementById('inspSettings').style.display=which==='settings'?'block':'none';
+  }
+  function setDevice(el,cls){
+    document.querySelectorAll('.dev').forEach(function(d){d.classList.remove('on')});el.classList.add('on');
+    var c=document.getElementById('canvas');c.className='canvas'+(cls?' '+cls:'');
+  }
+
+  var NAMES={hero:['Hero section','Hero section'],logo:['Image','Event logo'],title:['Heading','Title'],desc:['Text','Description'],widgets:['Widgets grid','Widgets grid'],embed:['Custom HTML','Embed']};
+  function selectEl(el,e){
+    if(e) e.stopPropagation();
+    document.querySelectorAll('.el.sel').forEach(function(x){x.classList.remove('sel')});
+    el.classList.add('sel');
+    var k=el.getAttribute('data-el'); var n=NAMES[k]||['Element',''];
+    document.getElementById('inspTag').textContent=n[0];
+    document.getElementById('inspName').textContent=n[1];
+    document.getElementById('inspEmpty').style.display='none';
+    var c=document.getElementById('inspContent'); c.style.display='flex';
+    // reflect matching layer
+    document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('on')});
+  }
+  function selectByLayer(el,k){
+    document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('on')});el.classList.add('on');
+    var target=document.querySelector('.el[data-el="'+k+'"]');
+    if(target){document.querySelectorAll('.el.sel').forEach(function(x){x.classList.remove('sel')});target.classList.add('sel');
+      var n=NAMES[k]||['Element',''];document.getElementById('inspTag').textContent=n[0];document.getElementById('inspName').textContent=n[1];
+      document.getElementById('inspEmpty').style.display='none';document.getElementById('inspContent').style.display='flex';
+      target.scrollIntoView({block:'center',behavior:'smooth'});}
+  }
+
+  function openPro(name){document.getElementById('proTitle').textContent=name+' is a Pro widget';document.getElementById('proScrim').classList.add('open');}
+  function closePro(){document.getElementById('proScrim').classList.remove('open');}
+  function openCode(){document.getElementById('codeScrim').classList.add('open');}
+  function closeCode(){document.getElementById('codeScrim').classList.remove('open');}
+  function addEmbed(){closeCode();var b=document.getElementById('embedBlock');b.style.display='block';b.scrollIntoView({block:'center',behavior:'smooth'});selectEl(b);toast('Custom HTML added');}
+</script>
+</body>
+</html>
