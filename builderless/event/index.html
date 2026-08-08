@@ -596,7 +596,14 @@
     document.getElementById('upScrim').classList.add('open');
   }
   function closeUpgrade(){ document.getElementById('upScrim').classList.remove('open'); }
-  function goBuilder(){ toast('Opening Builder…'); setTimeout(function(){ window.location.href='../builder/'; }, 500); }
+  function goBuilder(){
+    toast('Opening Builder…');
+    var href;
+    if(location.pathname.indexOf('/builderless/event')!==-1) href='/builderless/builder/';       // deployed
+    else if(location.href.indexOf('event-page')!==-1) href='advanced-builder.html';               // local flat files
+    else href='../builder/';
+    setTimeout(function(){ window.location.href=href; }, 500);
+  }
 </script>
 <script>
   var currentMode='preview';
