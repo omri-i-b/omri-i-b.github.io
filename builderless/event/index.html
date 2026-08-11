@@ -291,15 +291,32 @@
   .up-actions{display:flex;gap:8px;margin-top:18px}
   .up-compare{margin-top:14px;font-size:11.5px;color:var(--muted-2);text-align:center}
 
-  /* Drawer + toast */
-  #drawerScrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none}
-  #drawer{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:92vw;background:var(--panel);border-left:1px solid var(--line);
-    z-index:81;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
-  #drawer.open{transform:translateX(0)}
-  .dr-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
-  .dr-title{font-size:16px;font-weight:700}
+  /* Drawer + toast — Railway-style floating panel */
+  #drawerScrim{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:80;display:none;backdrop-filter:blur(1px)}
+  #drawer{position:fixed;top:66px;right:14px;bottom:14px;width:452px;max-width:calc(100vw - 28px);
+    background:var(--panel);border:1px solid var(--line-2,var(--line));border-radius:16px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.4);
+    z-index:81;transform:translateX(calc(100% + 26px));opacity:0;
+    transition:transform .26s cubic-bezier(.34,1.1,.4,1),opacity .18s ease;display:flex;flex-direction:column;overflow:hidden}
+  #drawer.open{transform:translateX(0);opacity:1}
+  .dr-head{display:flex;align-items:center;gap:11px;padding:15px 16px 13px}
+  .dr-ic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--accent)}
+  .dr-ic svg{width:17px;height:17px}
+  .dr-title{font-size:16px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dr-nav{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .dr-navbtn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--muted);border-right:1px solid var(--line)}
+  .dr-navbtn:last-child{border-right:none}
+  .dr-navbtn:hover:not(:disabled){background:var(--panel-3);color:var(--ink)}
+  .dr-navbtn:disabled{opacity:.32;cursor:default}
+  .dr-navbtn svg{width:15px;height:15px}
+  .dr-tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line)}
+  .dr-tab{position:relative;padding:9px 12px 11px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .dr-tab:hover{color:var(--ink)}
+  .dr-tab.on{color:var(--ink);border-bottom-color:var(--accent)}
   .dr-body{flex:1;overflow-y:auto;padding:16px 18px}
-  .dr-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .dr-hint{font-size:11px;color:var(--muted-2);padding:9px 18px 0}
+  .dr-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0}
   .dr-close:hover{background:var(--panel-2)}
   .dr-stat-row{display:flex;gap:10px;margin-bottom:16px}
   .dr-stat{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
@@ -554,12 +571,19 @@
     <button class="fab fab-add" onclick="toggleAddMenu(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add section</button>
   </div>
 
-  <!-- Manage drawer -->
+  <!-- Manage drawer — Railway-style floating panel -->
   <div id="drawerScrim" onclick="closeDrawer()"></div>
   <aside id="drawer">
-    <div class="dr-head"><div class="dr-title" id="drTitle">Manage</div>
+    <div class="dr-head">
+      <div class="dr-ic" id="drIc"></div>
+      <div class="dr-title" id="drTitle">Manage</div>
+      <div class="dr-nav">
+        <button class="dr-navbtn" id="drUp" onclick="navWidget(-1)" title="Previous widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 15l-6-6-6 6"/></svg></button>
+        <button class="dr-navbtn" id="drDown" onclick="navWidget(1)" title="Next widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
       <button class="dr-close" onclick="closeDrawer()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
+    <div class="dr-tabs" id="drTabs"></div>
     <div class="dr-body" id="drBody"></div>
   </aside>
 
@@ -716,8 +740,51 @@
   };
   function g(n,e,c,st){return '<div class="dr-guest"><span class="gl-av" style="background:'+c+'"></span><div class="info"><div class="nm">'+n+'</div><div class="em">'+e+'</div></div><span class="dr-tag '+(st==='yes'?'tag-yes':'tag-pending')+'">'+(st==='yes'?'Going':'Pending')+'</span></div>';}
   function s(t,tm){return '<div class="dr-guest"><div class="info"><div class="nm">'+t+'</div>'+(tm?'<div class="em">'+tm+'</div>':'')+'</div><span class="muted" style="font-size:16px;cursor:grab">⋮⋮</span></div>';}
-  function openDrawer(kind){var d=DRAWERS[kind];if(!d)return;document.getElementById('drTitle').textContent=d.title;document.getElementById('drBody').innerHTML=d.body;document.getElementById('drawerScrim').style.display='block';document.getElementById('drawer').classList.add('open');}
-  function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerScrim').style.display='none';}
+
+  /* Railway-style drawer: icons, ordered widget navigation, tabs (Manage / Settings) */
+  var DR_ICON={
+    guests:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+    schedule:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    location:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    photos:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    faq:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>'
+  };
+  var DR_ORDER=['guests','schedule','location','photos','faq'];
+  var DR_SETTINGS_KEY={guests:'guestlist',schedule:'schedule',location:'location',photos:'photos',faq:'faq'};
+  var drCurrent=null, drTab='manage';
+  function drawerHTML(kind,tab){
+    if(tab==='settings'){
+      var ik=DR_SETTINGS_KEY[kind], sp=INSPECT[ik];
+      return sp?sp.fields:'<p class="muted" style="font-size:13px">No settings.</p>';
+    }
+    return DRAWERS[kind].body;
+  }
+  function renderDrawerTabs(kind){
+    var tabs=document.getElementById('drTabs');
+    tabs.innerHTML=['manage','settings'].map(function(t){
+      return '<div class="dr-tab'+(t===drTab?' on':'')+'" onclick="setDrawerTab(\''+t+'\')">'+(t==='manage'?'Manage':'Settings')+'</div>';
+    }).join('');
+  }
+  function setDrawerTab(t){drTab=t;renderDrawerTabs(drCurrent);document.getElementById('drBody').innerHTML=drawerHTML(drCurrent,t);}
+  function openDrawer(kind){
+    var d=DRAWERS[kind];if(!d)return;
+    drCurrent=kind; drTab='manage';
+    document.getElementById('drIc').innerHTML=DR_ICON[kind]||'';
+    document.getElementById('drTitle').textContent=d.title;
+    renderDrawerTabs(kind);
+    document.getElementById('drBody').innerHTML=drawerHTML(kind,'manage');
+    var i=DR_ORDER.indexOf(kind);
+    document.getElementById('drUp').disabled=(i<=0);
+    document.getElementById('drDown').disabled=(i>=DR_ORDER.length-1);
+    document.getElementById('drawerScrim').style.display='block';
+    document.getElementById('drawer').classList.add('open');
+  }
+  function navWidget(dir){
+    var i=DR_ORDER.indexOf(drCurrent); if(i===-1)return;
+    var n=i+dir; if(n<0||n>=DR_ORDER.length)return;
+    openDrawer(DR_ORDER[n]);
+  }
+  function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerScrim').style.display='none';drCurrent=null;}
 
   // click empty canvas deselects
   document.querySelector('.page').addEventListener('click',function(e){
